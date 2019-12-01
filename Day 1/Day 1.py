@@ -1,19 +1,13 @@
 import math
 
-def partOne(lines) :
+def calculateFuel(lines, function) :
     total=0
     for line in lines:
-        total += calculateFuelPartOne(line)
+        total += function(line)
     print(total)
     
 def calculateFuelPartOne(line) :
     return math.floor(int(line)/3) - 2
-
-def partTwo(lines) :
-    total=0
-    for line in lines:
-        total += calculateFuelPartTwo(line)
-    print(total)
 
 def calculateFuelPartTwo(line) :
     fuel = 0
@@ -26,5 +20,5 @@ def calculateFuelPartTwo(line) :
 
 file = open("Input.txt", "r")
 lines = file.readlines()
-partOne(lines)
-partTwo(lines)
+calculateFuel(lines, calculateFuelPartOne)
+calculateFuel(lines, calculateFuelPartTwo)
