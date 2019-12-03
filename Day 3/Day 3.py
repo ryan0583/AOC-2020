@@ -1,3 +1,27 @@
+class WirePart:
+    def __init__(self, char, stepNum):
+        self.char = char
+        self.stepNum = stepNum
+
+    def get_stepNum(self):
+        return self.stepNum
+
+    def get_char(self):
+        return self.char
+    
+    def __str__(self):
+        return self.char
+
+class Crossing:
+    def __init__(self, totalSteps):
+        self.totalSteps = totalSteps
+
+    def get_totalSteps(self):
+        return self.totalSteps
+    
+    def __str__(self):
+        return "X"
+ 
 def maxPositive(instructions, posChar, negChar) :
     maxDist = 0
     runningTotal = 0
@@ -30,6 +54,7 @@ def printGrid(grid) :
     print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in grid]))
 
 def drawWire1(instructions, startX, startY, grid) :
+    stepNum = 0
     xPos = startX
     yPos = startY
     for instruction in instructions :
@@ -38,56 +63,71 @@ def drawWire1(instructions, startX, startY, grid) :
         
         if direction == "R" :
             for x in range(xPos + 1, xPos + 1 + distance) :
-                grid[yPos][x] = "~"
+                stepNum += 1
+                grid[yPos][x] = WirePart("~", stepNum)
             xPos = xPos + distance
         elif direction == "L" :
-            for x in range(xPos - distance, xPos) :
-                grid[yPos][x] = "~"
+            for x in range(xPos - 1, xPos - 1 - distance, -1) :
+                stepNum += 1
+                grid[yPos][x] = WirePart("~", stepNum)
             xPos = xPos - distance
         elif direction == "D" :
             for y in range(yPos + 1, yPos + 1 + distance) :
-                grid[y][xPos] = "l"
+                stepNum += 1
+                grid[y][xPos] = WirePart("l", stepNum)
             yPos = yPos + distance
         elif direction == "U" :
-            for y in range(yPos - distance, yPos) :
-                grid[y][xPos] = "l"
+            for y in range(yPos - 1, yPos - 1 - distance, -1) :
+                stepNum += 1
+                grid[y][xPos] = WirePart("l", stepNum)
             yPos = yPos - distance
 
         #printGrid(grid)
         #print("\n")
 
 def drawWire2(instructions, startX, startY, grid) :
+    stepNum = 0
     xPos = startX
     yPos = startY
     for instruction in instructions :
+        #print(stepNum)
         direction = instruction[0:1]
         distance = int(instruction[1:])
         
         if direction == "R" :
             for x in range(xPos + 1, xPos + 1 + distance) :
-                if grid[yPos][x] == "~" or grid[yPos][x] == "l" :
-                    grid[yPos][x] = "X"
+                stepNum += 1
+                if isinstance(grid[yPos][x], WirePart) :
+                    #print(str(stepNum) + ", " + str(grid[yPos][x].get_stepNum()))
+                    grid[yPos][x] = Crossing(stepNum + grid[yPos][x].get_stepNum())
                 else : 
                     grid[yPos][x] = "-"
             xPos = xPos + distance
         elif direction == "L" :
-            for x in range(xPos - distance, xPos) :
-                if grid[yPos][x] == "~" or grid[yPos][x] == "l" :
-                    grid[yPos][x] = "X"
+            for x in range(xPos - 1, xPos - 1 - distance, -1) :
+                stepNum += 1
+                #print(stepNum)
+                if isinstance(grid[yPos][x], WirePart) :
+                    #print(str(stepNum) + ", " + str(grid[yPos][x].get_stepNum()))
+                    grid[yPos][x] = Crossing(stepNum + grid[yPos][x].get_stepNum())
                 else : 
                     grid[yPos][x] = "-"
             xPos = xPos - distance
         elif direction == "D" :
             for y in range(yPos + 1, yPos + 1 + distance) :
-                if grid[y][xPos] == "~" or grid[y][xPos] == "l" :
-                    grid[y][xPos] = "X"
+                stepNum += 1
+                if isinstance(grid[y][xPos], WirePart) :
+                    #print(str(stepNum) + ", " + str(grid[y][xPos].get_stepNum()))
+                    grid[y][xPos] = Crossing(stepNum + grid[y][xPos].get_stepNum())
                 else :
                     grid[y][xPos] = "|"
             yPos = yPos + distance
         elif direction == "U" :
-            for y in range(yPos - distance, yPos) :
-                if grid[y][xPos] == "~" or grid[y][xPos] == "l" :
-                    grid[y][xPos] = "X"
+            for y in range(yPos - 1, yPos - 1 - distance, -1) :
+                stepNum += 1
+                if isinstance(grid[y][xPos], WirePart) :
+                    #print(str(stepNum) + ", " + str(grid[y][xPos].get_stepNum()))
+                    grid[y][xPos] = Crossing(stepNum + grid[y][xPos].get_stepNum())
                 else :
                     grid[y][xPos] = "|"
             yPos = yPos - distance
@@ -99,11 +139,22 @@ def findMinCrossingPosition(grid, portX, portY) :
     minCrossing = -1
     for y in range(0, len(grid)) :
         for x in range(0, len(grid[0])) :
-            if grid[y][x] == "X" :
+            if isinstance(grid[y][x], Crossing) :
                 dist = abs(y - portY) + abs(x - portX)
                 if minCrossing == -1 or dist < minCrossing :
                     minCrossing = dist
     return minCrossing
+
+def findMinCrossingSteps(grid, portX, portY) :
+    minSteps = -1
+    for y in range(0, len(grid)) :
+        for x in range(0, len(grid[0])) :
+            if isinstance(grid[y][x], Crossing) :
+                #print(grid[y][x].get_totalSteps())
+                if minSteps == -1 or grid[y][x].get_totalSteps() < minSteps :
+                    minSteps = grid[y][x].get_totalSteps()
+    print("\n")                    
+    return minSteps
             
 
 def createGrid(xDimension, yDimension) :
@@ -113,6 +164,10 @@ file = open("Input.txt", "r")
 instructionList = file.read().splitlines()
 wire1Instructions = instructionList[0].split(",")
 wire2Instructions = instructionList[1].split(",")
+
+#print(wire1Instructions)
+#print(wire2Instructions)
+
 allInstructions = wire1Instructions + wire2Instructions
 
 maxRight = max(maxPositive(wire1Instructions, "R", "L"), maxPositive(wire2Instructions, "R", "L"))
@@ -128,13 +183,14 @@ portX = maxLeft + 1
 portY = maxUp + 1
 grid[portY][portX] = "o"
 
-print(wire1Instructions)
-print(wire2Instructions)
+#print(wire1Instructions)
+#print(wire2Instructions)
 drawWire1(wire1Instructions, portX, portY, grid)
 drawWire2(wire2Instructions, portX, portY, grid)
 
 #printGrid(grid)
-print(findMinCrossingPosition(grid, portX, portY))
+#print(findMinCrossingPosition(grid, portX, portY))
+print(findMinCrossingSteps(grid, portX, portY))
 
 #print(allInstructions)
 
