@@ -17,10 +17,10 @@ def meetsCriteriaOne(value) :
     return hasDoubleDigit and numbersIncrease
 
 def meetsCriteriaTwo(value) :
-    hasDoubleDigit = False
     lastWasDouble = False
-    foundTripleCount = False
+    hasDoubleDigit = False
     numbersIncrease = True
+    numConsec = 1
     lastNum = -1
     nums = list(map(int, list(value)))
     for num in nums :
@@ -29,23 +29,25 @@ def meetsCriteriaTwo(value) :
             break
 
         if num == lastNum :
-            if lastWasDouble :
-                hasDoubleDigit = False
-                lastWasDouble = False
-                foundTripleCount = True
-            else :
-                hasDoubleDigit = True
+            numConsec += 1
+            if numConsec == 2 :
                 lastWasDouble = True
-        elif foundTripleCount :
-            break
+            else :
+                lastWasDouble = False
         else :
+            if lastWasDouble :
+                hasDoubleDigit = True
             lastWasDouble = False
+            numConsec = 1
 
         #debugPrint(debug, hasDoubleDigit)
-        #debugPrint(debug, lastWasDouble)
+        #debugPrint(debug, foundOddCount)
         #debugPrint(debug, "\n")
         
         lastNum = num
+
+    if lastWasDouble :
+        hasDoubleDigit= True
     return hasDoubleDigit and numbersIncrease
 
 def partOne() :
@@ -64,13 +66,16 @@ def partTwo() :
     print(count)
 
 
-debug = True
+debug = False
 file = open("Input.txt", "r")
 numRange = list(map(int, file.read().split("-")))
 #partOne()
 partTwo()
-#print(meetsCriteriaTwo("112233"))
-#print(meetsCriteriaTwo("123444"))
-#print(meetsCriteriaTwo("123443"))
-#print(meetsCriteriaTwo("112222"))
-#print(meetsCriteriaTwo("577788"))
+#print(meetsCriteriaTwo("112233")) #True
+#print(meetsCriteriaTwo("123444")) #False
+#print(meetsCriteriaTwo("123443")) #False
+#print(meetsCriteriaTwo("112222")) #True
+#print(meetsCriteriaTwo("577788")) #True
+#print(meetsCriteriaTwo("111111")) #False
+#print(meetsCriteriaTwo("122222")) #False
+#print(meetsCriteriaTwo("234444")) #False
