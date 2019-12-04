@@ -1,10 +1,3 @@
-import sys
-
-from Utils.utils import debug_print
-
-sys.path.append('../')
-
-
 def meets_criteria_one(value):
     has_double_digit = False
     numbers_increase = True
@@ -44,10 +37,6 @@ def meets_criteria_two(value):
             last_was_double = False
             num_consec = 1
 
-        # debugPrint(debug, has_double_digit)
-        # debugPrint(debug, foundOddCount)
-        # debugPrint(debug, "\n")
-
         last_num = num
 
     if last_was_double:
@@ -55,23 +44,25 @@ def meets_criteria_two(value):
     return has_double_digit and numbers_increase
 
 
-def part_one():
+def run(function_to_run):
+    file = open("Input.txt", "r")
+    num_range = list(map(int, file.read().split("-")))
+    count = function_to_run(num_range)
+    print(count)
+    return count
+
+
+def part_one(num_range):
     count = 0
     for value in range(num_range[0], num_range[1]):
         if meets_criteria_one(str(value)):
             count += 1
-    print(count)
+    return count
 
 
-def part_two():
+def part_two(num_range):
     count = 0
     for value in range(num_range[0], num_range[1]):
         if meets_criteria_two(str(value)):
-            debug_print(debug, value)
             count += 1
-    print(count)
-
-
-debug = False
-file = open("Input.txt", "r")
-num_range = list(map(int, file.read().split("-")))
+    return count

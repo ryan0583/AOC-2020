@@ -2,12 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="40e1fa5c-0fa7-46ce-b0a3-4da0fdc3240b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Day 2/day2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Day 1/Day 1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Day 1/Day 1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Day 2/Day 2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Day 3/Day 3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Day 3/day3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Day 4/Day 4.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Utils/Utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Day 4/day4.py" beforeDir="false" afterPath="$PROJECT_DIR$/Day 4/day4.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Day 4/day4_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/Day 4/day4_test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,10 +13,15 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/AOC_2019$Day_1.coverage" NAME="Day 1 Coverage Results" MODIFIED="1575485908808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 1" />
+    <SUITE FILE_PATH="coverage/AOC_2019$day4.coverage" NAME="day4 Coverage Results" MODIFIED="1575487329313" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 4" />
     <SUITE FILE_PATH="coverage/AOC_2019$Day_2.coverage" NAME="Day 2 Coverage Results" MODIFIED="1575485718581" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 2" />
+    <SUITE FILE_PATH="coverage/AOC_2019$Unittests_for_day4_test_Test_test_part_one.coverage" NAME="Unittests for day4_test.Test.test_part_one Coverage Results" MODIFIED="1575487175492" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 4" />
     <SUITE FILE_PATH="coverage/AOC_2019$Unittests_for_Day4_Test_Test_test2.coverage" NAME="Unittests for Day4_Test.Test.test2 Coverage Results" MODIFIED="1575484557377" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 4" />
     <SUITE FILE_PATH="coverage/AOC_2019$day3.coverage" NAME="day3 Coverage Results" MODIFIED="1575485473802" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 3" />
-    <SUITE FILE_PATH="coverage/AOC_2019$Unittests_in_Day4_Test_py.coverage" NAME="Unittests in day4_test.py Coverage Results" MODIFIED="1575484930442" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 4" />
+    <SUITE FILE_PATH="coverage/AOC_2019$Unittests_for_day4_test_Test.coverage" NAME="Unittests for day4_test.Test Coverage Results" MODIFIED="1575487025197" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 4" />
+    <SUITE FILE_PATH="coverage/AOC_2019$Unittests_for_day4_test_Run.coverage" NAME="Unittests for day4_test.Run Coverage Results" MODIFIED="1575486808488" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 4" />
+    <SUITE FILE_PATH="coverage/AOC_2019$Unittests_in_Day4_Test_py.coverage" NAME="Unittests in day4_test.py Coverage Results" MODIFIED="1575486815681" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Day 4" />
   </component>
   <component name="FUSProjectUsageTrigger">
     <session id="-917319793">
@@ -31,24 +33,26 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="6" />
+          <entry key="py" value="9" />
+          <entry key="txt" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="6" />
+          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="Python" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="dummy" value="84" />
-          <entry key="py" value="89" />
+          <entry key="dummy" value="85" />
+          <entry key="py" value="409" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="84" />
-          <entry key="Python" value="89" />
+          <entry key="PLAIN_TEXT" value="85" />
+          <entry key="Python" value="409" />
         </counts>
       </usages-collector>
     </session>
@@ -64,13 +68,49 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Day 1/Day 1.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Day 1/day1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="24" column="24" lean-forward="true" selection-start-line="24" selection-start-column="24" selection-end-line="24" selection-end-column="24" />
+            <state>
+              <caret column="11" lean-forward="true" selection-start-column="11" selection-end-column="11" />
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Day 4/day4.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="296">
+              <caret line="70" column="12" selection-start-line="70" selection-start-column="12" selection-end-line="70" selection-end-column="12" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Day 4/day4_test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="60" selection-start-line="2" selection-start-column="60" selection-end-line="2" selection-end-column="60" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+                <marker date="1575487344433" expanded="true" signature="77:80" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python38/Lib/unittest/case.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="146">
+              <caret line="1413" column="20" selection-start-line="1413" selection-start-column="20" selection-end-line="1413" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Day 4/Input.txt">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
@@ -93,13 +133,13 @@
       <list>
         <option value="$PROJECT_DIR$/Day 4/Day4.py" />
         <option value="$PROJECT_DIR$/Day 4/Day4_Test.py" />
-        <option value="$PROJECT_DIR$/Day 4/day4_test.py" />
-        <option value="$PROJECT_DIR$/Day 4/day4.py" />
         <option value="$PROJECT_DIR$/Day 3/Day 3.py" />
         <option value="$PROJECT_DIR$/Utils/utils.py" />
         <option value="$PROJECT_DIR$/Day 3/day3.py" />
         <option value="$PROJECT_DIR$/Day 2/Day 2.py" />
         <option value="$PROJECT_DIR$/Day 1/Day 1.py" />
+        <option value="$PROJECT_DIR$/Day 4/day4.py" />
+        <option value="$PROJECT_DIR$/Day 4/day4_test.py" />
       </list>
     </option>
   </component>
@@ -163,7 +203,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575485831418" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575487259137" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -183,62 +223,21 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.Day 2">
-    <configuration name="Day 2" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.day4">
+    <configuration name="day4" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="AOC-2019" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Day 2" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\Ryan.Griffiths\Documents\AOC-2019\Day 2\day2.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Day4" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="AOC-2019" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Day 4" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\Ryan.Griffiths\Documents\AOC-2019\Day 4\day4.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="day3" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="AOC-2019" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Day 3" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Day 3/day3.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Day 4/day4.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -247,7 +246,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Unittests for Day4_Test.Test.test2" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+    <configuration name="Unittests for day4_test.Run" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <module name="AOC-2019" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -258,7 +257,37 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;Day4_Test.Test.test2&quot;" />
+      <option name="_new_target" value="&quot;day4_test.Run&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unittests for day4_test.Test" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <module name="AOC-2019" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Day 4" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;day4_test.Test&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unittests for day4_test.Test.test_part_one" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <module name="AOC-2019" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Day 4" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;day4_test.Test.test_part_one&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
@@ -278,19 +307,19 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.Day4" />
-      <item itemvalue="Python tests.Unittests for Day4_Test.Test.test2" />
       <item itemvalue="Python tests.Unittests in day4_test.py" />
-      <item itemvalue="Python.day3" />
-      <item itemvalue="Python.Day 2" />
+      <item itemvalue="Python tests.Unittests for day4_test.Test" />
+      <item itemvalue="Python tests.Unittests for day4_test.Run" />
+      <item itemvalue="Python tests.Unittests for day4_test.Test.test_part_one" />
+      <item itemvalue="Python.day4" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Day 2" />
-        <item itemvalue="Python.day3" />
+        <item itemvalue="Python.day4" />
+        <item itemvalue="Python tests.Unittests for day4_test.Test.test_part_one" />
+        <item itemvalue="Python tests.Unittests for day4_test.Test" />
         <item itemvalue="Python tests.Unittests in day4_test.py" />
-        <item itemvalue="Python tests.Unittests for Day4_Test.Test.test2" />
-        <item itemvalue="Python.Day4" />
+        <item itemvalue="Python tests.Unittests for day4_test.Run" />
       </list>
     </recent_temporary>
   </component>
@@ -304,23 +333,44 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1575484153837</updated>
-      <workItem from="1575484157290" duration="1745000" />
+      <workItem from="1575484157290" duration="3184000" />
     </task>
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_for_Day4_Test_Test_test2 - 2019.12.04 at 18h 35m 58s.xml">
-      <configuration name="Unittests for Day4_Test.Test.test2" configurationId="tests" />
+    <history-entry file="Unittests_for_day4_test_Run - 2019.12.04 at 19h 13m 28s.xml">
+      <configuration name="Unittests for day4_test.Run" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_Day4_Test_py - 2019.12.04 at 18h 36m 12s.xml">
-      <configuration name="Unittests in Day4_Test.py" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_in_day4_test_py - 2019.12.04 at 18h 42m 11s.xml">
+    <history-entry file="Unittests_in_day4_test_py - 2019.12.04 at 19h 13m 35s.xml">
       <configuration name="Unittests in day4_test.py" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day4_test_Test - 2019.12.04 at 19h 16m 11s.xml">
+      <configuration name="Unittests for day4_test.Test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day4_test_Test - 2019.12.04 at 19h 16m 31s.xml">
+      <configuration name="Unittests for day4_test.Test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day4_test_Test - 2019.12.04 at 19h 17m 05s.xml">
+      <configuration name="Unittests for day4_test.Test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day4_test_Test_test_part_one - 2019.12.04 at 19h 17m 37s.xml">
+      <configuration name="Unittests for day4_test.Test.test_part_one" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day4_test_Test_test_part_one - 2019.12.04 at 19h 17m 54s.xml">
+      <configuration name="Unittests for day4_test.Test.test_part_one" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day4_test_Test_test_part_one - 2019.12.04 at 19h 18m 54s.xml">
+      <configuration name="Unittests for day4_test.Test.test_part_one" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day4_test_Test_test_part_one - 2019.12.04 at 19h 19m 18s.xml">
+      <configuration name="Unittests for day4_test.Test.test_part_one" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day4_test_Test_test_part_one - 2019.12.04 at 19h 19m 36s.xml">
+      <configuration name="Unittests for day4_test.Test.test_part_one" configurationId="tests" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1745000" />
+    <option name="totallyTimeSpent" value="3184000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
@@ -335,11 +385,11 @@
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Terminal" weight="0.1716312" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32907802" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.34042552" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3432624" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -363,16 +413,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Day 4/day4.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="436">
-          <caret line="70" column="20" lean-forward="true" selection-start-line="70" selection-start-column="20" selection-end-line="70" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Utils/utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
@@ -390,15 +430,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Day 4/day4_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="20" lean-forward="true" selection-start-line="13" selection-start-column="20" selection-end-line="13" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/Day 4/Input.txt">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/Day 2/day2.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -407,10 +440,35 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Day 1/Day 1.py">
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python38/Lib/unittest/case.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="24" column="24" lean-forward="true" selection-start-line="24" selection-start-column="24" selection-end-line="24" selection-end-column="24" />
+        <state relative-caret-position="146">
+          <caret line="1413" column="20" selection-start-line="1413" selection-start-column="20" selection-end-line="1413" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Day 1/day1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="11" lean-forward="true" selection-start-column="11" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Day 4/day4.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="296">
+          <caret line="70" column="12" selection-start-line="70" selection-start-column="12" selection-end-line="70" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Day 4/day4_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="60" selection-start-line="2" selection-start-column="60" selection-end-line="2" selection-end-column="60" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+            <marker date="1575487344433" expanded="true" signature="77:80" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
