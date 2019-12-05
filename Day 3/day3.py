@@ -1,6 +1,6 @@
 import sys
 
-from Utils.utils import create_grid, debug_print, print_grid
+from Utils.debug_tools import create_grid, debug_print, print_grid
 
 sys.path.append('../')
 
