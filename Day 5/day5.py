@@ -53,8 +53,46 @@ def perform_calculation(instruction, index):
     return index + 4
 
 
+def perform_jump_if_true(instruction, index):
+    val1 = get_val(instruction.param1_mode, ints[index + 1])
+
+    if val1 != 0:
+        return get_val(instruction.param2_mode, ints[index + 2])
+    return index + 3
+
+
+def perform_jump_if_false(instruction, index):
+    val1 = get_val(instruction.param1_mode, ints[index + 1])
+
+    if val1 == 0:
+        return get_val(instruction.param2_mode, ints[index + 2])
+    return index + 3
+
+
+def perform_less_than(instruction, index):
+    val1 = get_val(instruction.param1_mode, ints[index + 1])
+    val2 = get_val(instruction.param2_mode, ints[index + 2])
+
+    if val1 < val2:
+        ints[ints[index + 3]] = 1
+    else:
+        ints[ints[index + 3]] = 0
+    return index + 4
+
+
+def perform_equals(instruction, index):
+    val1 = get_val(instruction.param1_mode, ints[index + 1])
+    val2 = get_val(instruction.param2_mode, ints[index + 2])
+
+    if val1 == val2:
+        ints[ints[index + 3]] = 1
+    else:
+        ints[ints[index + 3]] = 0
+    return index + 4
+
+
 def perform_ouput_instruction(instruction, index):
-    print(ints[index:index + 2])
+    # print(ints[index:index + 2])
     if instruction.get_param1_mode() == "1":
         output = ints[index + 1]
     else:
@@ -64,16 +102,16 @@ def perform_ouput_instruction(instruction, index):
     return index + 2
 
 
-def process():
+def process_part_1():
     index = 0
     val = str(ints[index])
     instruction = process_instruction(str(val))
     opcode = instruction.get_opcode()
     while opcode != "9":
-        print(instruction)
+        # print(instruction)
 
         if last_output != 0:
-             raise Exception("Oh dear, output should be 0!!, but was " + str(last_output))
+            raise Exception("Oh dear, output should be 0!!, but was " + str(last_output))
 
         if opcode == "1" or opcode == "2":
             index = perform_calculation(instruction, index)
@@ -87,9 +125,42 @@ def process():
         opcode = instruction.get_opcode()
 
 
+def process_part_2():
+    index = 0
+    val = str(ints[index])
+    instruction = process_instruction(str(val))
+    opcode = instruction.get_opcode()
+    while opcode != "9":
+        # print(instruction)
+
+        if last_output != 0:
+            raise Exception("Oh dear, output should be 0, but was " + str(last_output))
+
+        if opcode == "1" or opcode == "2":
+            index = perform_calculation(instruction, index)
+        elif opcode == "3":
+            index = perform_input_instruction(index)
+        elif opcode == "4":
+            index = perform_ouput_instruction(instruction, index)
+        elif opcode == "5":
+            index = perform_jump_if_true(instruction, index)
+        elif opcode == "6":
+            index = perform_jump_if_false(instruction, index)
+        elif opcode == "7":
+            index = perform_less_than(instruction, index)
+        elif opcode == "8":
+            index = perform_equals(instruction, index)
+
+        val = str(ints[index])
+        instruction = process_instruction(str(val))
+        opcode = instruction.get_opcode()
+
+
 file = open("input.txt", "r")
 ints = list(map(int, file.read().split(",")))
-input_val = 1
 last_output = 0
-process()
+#input_val = 1
+#process_part_1()
+input_val = 5
+process_part_2()
 print(last_output)
