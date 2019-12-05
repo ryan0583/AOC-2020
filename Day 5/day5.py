@@ -31,20 +31,20 @@ def process_instruction(value):
     return Instruction(opcode, param1_mode, param2_mode)
 
 
-def get_val(param_mode, list, value):
+def get_val(param_mode, value):
     if param_mode == "1":
         return value
-    return list[value]
+    return ints[value]
 
 
 def perform_input_instruction(index):
-    ints[ints[index + 1]] = input
+    ints[ints[index + 1]] = input_val
     return index + 2
 
 
 def perform_calculation(instruction, index):
-    val1 = get_val(instruction.get_param1_mode(), ints, ints[index + 1])
-    val2 = get_val(instruction.get_param2_mode(), ints, ints[index + 2])
+    val1 = get_val(instruction.get_param1_mode(), ints[index + 1])
+    val2 = get_val(instruction.get_param2_mode(), ints[index + 2])
     if instruction.get_opcode() == "1":
         val = val1 + val2
     else:
@@ -69,7 +69,7 @@ def process():
     val = str(ints[index])
     instruction = process_instruction(str(val))
     opcode = instruction.get_opcode()
-    while opcode != "99":
+    while opcode != "9":
         print(instruction)
 
         if last_output != 0:
@@ -89,7 +89,7 @@ def process():
 
 file = open("input.txt", "r")
 ints = list(map(int, file.read().split(",")))
-input = 1
+input_val = 1
 last_output = 0
 process()
 print(last_output)
