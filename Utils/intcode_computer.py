@@ -43,64 +43,44 @@ def process(input_val, ints):
         }
         return param_mode_switcher.get(param_mode, lambda: "Invalid param mode" + param_mode)()
 
+    def get_values():
+        return (get_val(instruction.get_param1_mode(), ints[index + 1]),
+                get_val(instruction.get_param2_mode(), ints[index + 2]))
+
     def perform_input_instruction():
         ints[ints[index + 1]] = input_val
         return index + 2,
 
     def perform_add():
-        val1 = get_val(instruction.get_param1_mode(), ints[index + 1])
-        val2 = get_val(instruction.get_param2_mode(), ints[index + 2])
-        val = val1 + val2
-        ints[ints[index + 3]] = val
+        values = get_values()
+        ints[ints[index + 3]] = values[0] + values[1]
         return index + 4,
 
     def perform_multiply():
-        val1 = get_val(instruction.get_param1_mode(), ints[index + 1])
-        val2 = get_val(instruction.get_param2_mode(), ints[index + 2])
-        val = val1 * val2
-        ints[ints[index + 3]] = val
+        values = get_values()
+        ints[ints[index + 3]] = values[0] * values[1]
         return index + 4,
 
     def perform_jump_if_true():
         val1 = get_val(instruction.param1_mode, ints[index + 1])
-
-        if val1 != 0:
-            return get_val(instruction.param2_mode, ints[index + 2]),
-        return index + 3,
+        return get_val(instruction.param2_mode, ints[index + 2]) if val1 != 0 else index + 3,
 
     def perform_jump_if_false():
         val1 = get_val(instruction.param1_mode, ints[index + 1])
-
-        if val1 == 0:
-            return get_val(instruction.param2_mode, ints[index + 2]),
-        return index + 3,
+        return get_val(instruction.param2_mode, ints[index + 2]) if val1 == 0 else index + 3,
 
     def perform_less_than():
-        val1 = get_val(instruction.param1_mode, ints[index + 1])
-        val2 = get_val(instruction.param2_mode, ints[index + 2])
-
-        if val1 < val2:
-            ints[ints[index + 3]] = 1
-        else:
-            ints[ints[index + 3]] = 0
+        values = get_values()
+        ints[ints[index + 3]] = 1 if values[0] < values[1] else 0
         return index + 4,
 
     def perform_equals():
-        val1 = get_val(instruction.param1_mode, ints[index + 1])
-        val2 = get_val(instruction.param2_mode, ints[index + 2])
-
-        if val1 == val2:
-            ints[ints[index + 3]] = 1
-        else:
-            ints[ints[index + 3]] = 0
+        values = get_values()
+        ints[ints[index + 3]] = 1 if values[0] == values[1] else 0
         return index + 4,
 
     def perform_output_instruction():
-        if instruction.get_param1_mode() == "1":
-            output = ints[index + 1]
-        else:
-            output = ints[ints[index + 1]]
-        return index + 2, output
+        return index + 2, get_val(instruction.get_param1_mode(), ints[index + 1])
 
     opcode_switcher = {
         ADD: perform_add,

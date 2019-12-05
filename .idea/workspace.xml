@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="40e1fa5c-0fa7-46ce-b0a3-4da0fdc3240b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Utils/intcode_computer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Day 3/day3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Day 3/day3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Day 5/day5.py" beforeDir="false" afterPath="$PROJECT_DIR$/Day 5/day5.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Day 5/day5_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/Day 5/day5_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Utils/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/debug_tools.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Utils/intcode_computer.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/intcode_computer.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -69,8 +63,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Utils/intcode_computer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="67" column="69" selection-start-line="67" selection-start-column="69" selection-end-line="67" selection-end-column="69" />
+            <state relative-caret-position="210">
+              <caret line="59" column="29" selection-start-line="59" selection-start-column="29" selection-end-line="59" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -118,6 +112,8 @@
       <find>localInts</find>
       <find>9,</find>
       <find>debug_too</find>
+      <find>&quot;0&quot;</find>
+      <find>&quot;1&quot;</find>
     </findStrings>
     <replaceStrings>
       <replace>meets_criteria_two</replace>
@@ -210,7 +206,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575579988437" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575581733314" />
     <property name="jdk.selected.JAVA_MODULE" value="1.8" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -345,21 +341,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_for_day5_test_Test_test_part2 - 2019.12.05 at 19h 57m 10s.xml">
-      <configuration name="Unittests for day5_test.Test.test_part2" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 20h 55m 04s.xml">
-      <configuration name="Unittests for day5_test.Test" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_for_day5_test_Test_test_part2 - 2019.12.05 at 20h 56m 41s.xml">
-      <configuration name="Unittests for day5_test.Test.test_part2" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_for_day5_test_Test_test_part1 - 2019.12.05 at 20h 56m 44s.xml">
-      <configuration name="Unittests for day5_test.Test.test_part1" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 20h 56m 46s.xml">
-      <configuration name="Unittests for day5_test.Test" configurationId="tests" />
-    </history-entry>
     <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 20h 57m 32s.xml">
       <configuration name="Unittests for day5_test.Test" configurationId="tests" />
     </history-entry>
@@ -373,6 +354,21 @@
       <configuration name="Unittests for day5_test.Test" configurationId="tests" />
     </history-entry>
     <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 21h 09m 24s.xml">
+      <configuration name="Unittests for day5_test.Test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 21h 20m 11s.xml">
+      <configuration name="Unittests for day5_test.Test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 21h 20m 15s.xml">
+      <configuration name="Unittests for day5_test.Test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 21h 29m 31s.xml">
+      <configuration name="Unittests for day5_test.Test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 21h 30m 50s.xml">
+      <configuration name="Unittests for day5_test.Test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_day5_test_Test - 2019.12.05 at 21h 33m 57s.xml">
       <configuration name="Unittests for day5_test.Test" configurationId="tests" />
     </history-entry>
   </component>
@@ -392,7 +388,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32824427" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.4778626" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3908397" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -510,8 +506,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Utils/intcode_computer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="67" column="69" selection-start-line="67" selection-start-column="69" selection-end-line="67" selection-end-column="69" />
+        <state relative-caret-position="210">
+          <caret line="59" column="29" selection-start-line="59" selection-start-column="29" selection-end-line="59" selection-end-column="29" />
         </state>
       </provider>
     </entry>
