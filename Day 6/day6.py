@@ -18,34 +18,42 @@ class Node:
 
 def parse_nodes():
     def create_node():
-        def update_next_node_if_match():
-            if node.get_name() == main_obj_name:
-                new_node.set_next_node(node)
+        def update_next_node():
+            _node = node_name_to_node.get(main_obj_name)
+            new_node.set_next_node(_node) if _node is not None else new_node.set_next_node(Node(main_obj_name))
 
-        def update_prev_node_if_match():
-            next_node = node.get_next_node()
-            if next_node is not None and next_node.get_name() == orbit_obj_name:
-                node.set_next_node(new_node)
-
-        def create_and_set_next_node():
-            next_node = Node(main_obj_name)
-            new_node.set_next_node(next_node)
+        def update_prev_nodes():
+            _nodes = next_node_name_to_nodes.get(orbit_obj_name)
+            if _nodes is not None:
+                for _node in _nodes:
+                    _node.set_next_node(new_node)
 
         new_node = Node(orbit_obj_name)
-        for node in node_list:
-            update_next_node_if_match()
-            update_prev_node_if_match()
-
-        if new_node.get_next_node() is None:
-            create_and_set_next_node()
+        update_next_node()
+        update_prev_nodes()
         return new_node
 
+    def update_maps():
+        node_name_to_node[node.get_name()] = node
+        next_node = node.get_next_node()
+        if next_node is not None:
+            next_node_name = next_node.get_name()
+            existing_node_list = next_node_name_to_nodes.get(next_node_name)
+            if existing_node_list is None:
+                next_node_name_to_nodes[next_node_name] = [node]
+            else:
+                existing_node_list.append(node)
+
     node_list = []
+    node_name_to_node = {}
+    next_node_name_to_nodes = {}
     for orbit in orbit_data:
         split = orbit.split(")")
         main_obj_name = split[0].strip()
         orbit_obj_name = split[1].strip()
-        node_list.append(create_node())
+        node = create_node()
+        node_list.append(node)
+        update_maps()
 
     return node_list
 
