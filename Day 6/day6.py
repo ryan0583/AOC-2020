@@ -19,11 +19,25 @@ class Node:
         return self.name
 
 
+class StepCount:
+    def __init__(self, node_name, num_steps):
+        self.node_name = node_name
+        self.num_steps = num_steps
+
+    def get_node_name(self):
+        return self.node_name
+
+    def get_num_steps(self):
+        return self.num_steps
+
+    def __str__(self):
+        return self.node_name + ", " + str(self.num_steps)
+
+
 def print_node_list(node_list):
     print_str = "Node List is ..."
     for node in node_list:
         print_str += str(node)
-    debug_print(debug, print_str)
 
 
 def parse_nodes():
@@ -37,8 +51,6 @@ def parse_nodes():
         if new_node.get_next_node() is None:
             next_node = Node(main_obj_name)
             new_node.set_next_node(next_node)
-
-        debug_print(debug, print_node(new_node) + "\n")
 
         for node in node_list:
             next_node = node.get_next_node()
@@ -73,7 +85,6 @@ def count_orbits(node_list):
         while next_node is not None:
             node_count += 1
             next_node = next_node.get_next_node()
-        debug_print(debug, "\nDone Node " + str(node) + " Count was " + str(node_count) + "\n")
         return node_count
 
     count = 0
@@ -82,7 +93,55 @@ def count_orbits(node_list):
     return count
 
 
+def find_node_for_name(node_list, name):
+    for node in node_list:
+        if node.get_name() == name:
+            return node
+
+
+def get_steps(node):
+    steps = []
+    step_count = 0
+    next_node = node.get_next_node()
+    while next_node is not None:
+        step = StepCount(next_node.get_name(), step_count)
+        debug_print(debug, step)
+        steps.append(step)
+        step_count += 1
+        next_node = next_node.get_next_node()
+    return steps
+
+
+def find_common_node(you_steps, san_node):
+    total_steps = 0
+    step_count = 0
+    found = False
+    next_node = san_node.get_next_node()
+    while not found and next_node is not None:
+        for step in you_steps:
+            if step.get_node_name() == next_node.get_name():
+                debug_print(debug, "Common node is " + step.get_node_name())
+                total_steps = step.get_num_steps() + step_count
+                found = True
+        step_count += 1
+        next_node = next_node.get_next_node()
+    return total_steps
+
+
+def part_one():
+    print(count_orbits(parse_nodes()))
+
+
+def part_two():
+    nodes = parse_nodes()
+    you_node = find_node_for_name(nodes, "YOU")
+    you_steps = get_steps(you_node)
+    san_node = find_node_for_name(nodes, "SAN")
+    print(find_common_node(you_steps, san_node))
+
+
 debug = False
 file = open("input.txt", "r")
 orbit_data = file.readlines()
-print(count_orbits(parse_nodes()))
+# part_one()
+part_two()
