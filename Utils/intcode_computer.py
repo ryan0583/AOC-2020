@@ -45,84 +45,101 @@ class InputCounter:
     def get_input_count(self):
         return self.input_count
 
-def process(input_vals, ints):
-    def get_val(param_mode, value):
-        param_mode_switcher = {
-            PARAM_MODE_LOOKUP: lambda: _ints[value],
-            PARAM_MODE_DIRECT: lambda: value
+
+class IntcodeComputer:
+    def __init__(self, input_vals, ints, return_first_output):
+        self.ints = list(ints)
+        self.input_vals = list(input_vals)
+        self.index = 0
+        self.return_first_output = return_first_output
+        self.opcode = None
+        self.input_counter = InputCounter(0)
+        self.last_output = 0
+
+    def is_stopped(self):
+        return self.opcode is not None and self.opcode == STOP
+
+    def append_input_val(self, input_val):
+        self.input_vals.append(input_val)
+
+    def set_last_output(self, output):
+        self.last_output = output
+
+    def process(self):
+        def get_val(param_mode, value):
+            param_mode_switcher = {
+                PARAM_MODE_LOOKUP: lambda: self.ints[value],
+                PARAM_MODE_DIRECT: lambda: value
+            }
+            return param_mode_switcher.get(param_mode, lambda: "Invalid param mode" + param_mode)()
+
+        def get_values():
+            return (get_val(instruction.get_param1_mode(), self.ints[self.index + 1]),
+                    get_val(instruction.get_param2_mode(), self.ints[self.index + 2]))
+
+        def perform_input_instruction():
+            self.ints[self.ints[self.index + 1]] = self.input_vals[self.input_counter.get_input_count()]
+            self.input_counter.increment_count()
+            return self.index + 2,
+
+        def perform_add():
+            values = get_values()
+            self.ints[self.ints[self.index + 3]] = values[0] + values[1]
+            return self.index + 4,
+
+        def perform_multiply():
+            values = get_values()
+            self.ints[self.ints[self.index + 3]] = values[0] * values[1]
+            return self.index + 4,
+
+        def perform_jump_if_true():
+            val1 = get_val(instruction.param1_mode, self.ints[self.index + 1])
+            return get_val(instruction.param2_mode, self.ints[self.index + 2]) if val1 != 0 else self.index + 3,
+
+        def perform_jump_if_false():
+            val1 = get_val(instruction.param1_mode, self.ints[self.index + 1])
+            return get_val(instruction.param2_mode, self.ints[self.index + 2]) if val1 == 0 else self.index + 3,
+
+        def perform_less_than():
+            values = get_values()
+            self.ints[self.ints[self.index + 3]] = 1 if values[0] < values[1] else 0
+            return self.index + 4,
+
+        def perform_equals():
+            values = get_values()
+            self.ints[self.ints[self.index + 3]] = 1 if values[0] == values[1] else 0
+            return self.index + 4,
+
+        def perform_output_instruction():
+            return self.index + 2, get_val(instruction.get_param1_mode(), self.ints[self.index + 1])
+
+        opcode_switcher = {
+            ADD: perform_add,
+            MULTIPLY: perform_multiply,
+            INPUT: perform_input_instruction,
+            OUTPUT: perform_output_instruction,
+            JUMP_IF_TRUE: perform_jump_if_true,
+            JUMP_IF_FALSE: perform_jump_if_false,
+            LESS_THAN: perform_less_than,
+            EQUALS: perform_equals
         }
-        return param_mode_switcher.get(param_mode, lambda: "Invalid param mode" + param_mode)()
 
-    def get_values():
-        return (get_val(instruction.get_param1_mode(), _ints[index + 1]),
-                get_val(instruction.get_param2_mode(), _ints[index + 2]))
+        instruction = Instruction.get_instruction(str(self.ints[self.index]))
+        self.opcode = instruction.get_opcode()
+        while not self.is_stopped():
+            #if self.last_output != 0:
+             #   raise Exception("Output should be 0, but was " + str(self.last_output))
 
-    def perform_input_instruction():
-        _ints[_ints[index + 1]] = input_vals[input_counter.get_input_count()]
-        input_counter.increment_count()
-        return index + 2,
+            result = opcode_switcher.get(self.opcode, lambda: "Invalid opcode" + self.opcode)()
+            self.index = result[0]
+            if len(result) == 2:
+                self.set_last_output(result[1])
+                if self.return_first_output:
+                    return self.last_output
 
-    def perform_add():
-        values = get_values()
-        _ints[_ints[index + 3]] = values[0] + values[1]
-        return index + 4,
-
-    def perform_multiply():
-        values = get_values()
-        _ints[_ints[index + 3]] = values[0] * values[1]
-        return index + 4,
-
-    def perform_jump_if_true():
-        val1 = get_val(instruction.param1_mode, _ints[index + 1])
-        return get_val(instruction.param2_mode, _ints[index + 2]) if val1 != 0 else index + 3,
-
-    def perform_jump_if_false():
-        val1 = get_val(instruction.param1_mode, _ints[index + 1])
-        return get_val(instruction.param2_mode, _ints[index + 2]) if val1 == 0 else index + 3,
-
-    def perform_less_than():
-        values = get_values()
-        _ints[_ints[index + 3]] = 1 if values[0] < values[1] else 0
-        return index + 4,
-
-    def perform_equals():
-        values = get_values()
-        _ints[_ints[index + 3]] = 1 if values[0] == values[1] else 0
-        return index + 4,
-
-    def perform_output_instruction():
-        return index + 2, get_val(instruction.get_param1_mode(), _ints[index + 1])
-
-    _ints = list(ints)
-
-    opcode_switcher = {
-        ADD: perform_add,
-        MULTIPLY: perform_multiply,
-        INPUT: perform_input_instruction,
-        OUTPUT: perform_output_instruction,
-        JUMP_IF_TRUE: perform_jump_if_true,
-        JUMP_IF_FALSE: perform_jump_if_false,
-        LESS_THAN: perform_less_than,
-        EQUALS: perform_equals
-    }
-
-    index = 0
-    last_output = 0
-    input_counter = InputCounter(0)
-    instruction = Instruction.get_instruction(str(_ints[index]))
-    opcode = instruction.get_opcode()
-    while opcode != STOP:
-        if last_output != 0:
-            raise Exception("Output should be 0, but was " + str(last_output))
-
-        result = opcode_switcher.get(opcode, lambda: "Invalid opcode" + opcode)()
-        index = result[0]
-        if len(result) == 2:
-            last_output = result[1]
-
-        instruction = Instruction.get_instruction(str(_ints[index]))
-        opcode = instruction.get_opcode()
-    return last_output
+            instruction = Instruction.get_instruction(str(self.ints[self.index]))
+            self.opcode = instruction.get_opcode()
+        return self.last_output
 
 
 ADD = "01"
