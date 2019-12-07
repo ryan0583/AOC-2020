@@ -35,47 +35,56 @@ class IntcodeComputer:
             return (get_val(instruction.param1_mode, self.ints[self.index + 1]),
                     get_val(instruction.param2_mode, self.ints[self.index + 2]))
 
-        def perform_input_instruction():
+        def perform_input():
             self.ints[self.ints[self.index + 1]] = self.input_vals[self.input_count]
             self.input_count += 1
-            return self.index + 2,
+            return self.index + 2
 
         def perform_add():
             values = get_values()
             self.ints[self.ints[self.index + 3]] = values[0] + values[1]
-            return self.index + 4,
+            return self.index + 4
 
         def perform_multiply():
             values = get_values()
             self.ints[self.ints[self.index + 3]] = values[0] * values[1]
-            return self.index + 4,
+            return self.index + 4
 
         def perform_jump_if_true():
             val1 = get_val(instruction.param1_mode, self.ints[self.index + 1])
-            return get_val(instruction.param2_mode, self.ints[self.index + 2]) if val1 != 0 else self.index + 3,
+            return get_val(instruction.param2_mode, self.ints[self.index + 2]) if val1 != 0 else self.index + 3
 
         def perform_jump_if_false():
             val1 = get_val(instruction.param1_mode, self.ints[self.index + 1])
-            return get_val(instruction.param2_mode, self.ints[self.index + 2]) if val1 == 0 else self.index + 3,
+            return get_val(instruction.param2_mode, self.ints[self.index + 2]) if val1 == 0 else self.index + 3
 
         def perform_less_than():
             values = get_values()
             self.ints[self.ints[self.index + 3]] = 1 if values[0] < values[1] else 0
-            return self.index + 4,
+            return self.index + 4
 
         def perform_equals():
             values = get_values()
             self.ints[self.ints[self.index + 3]] = 1 if values[0] == values[1] else 0
-            return self.index + 4,
+            return self.index + 4
 
-        def perform_output_instruction():
-            return self.index + 2, get_val(instruction.param1_mode, self.ints[self.index + 1])
+        def perform_output():
+            self.last_output = get_val(instruction.param1_mode, self.ints[self.index + 1])
+            return self.index + 2
+
+        def get_output():
+            if self.return_on_output:
+                output_to_return = self.last_output
+                self.last_output = 0
+                return output_to_return
+            else:
+                raise Exception("Output should be 0, but was " + str(self.last_output))
 
         opcode_switcher = {
             ADD: perform_add,
             MULTIPLY: perform_multiply,
-            INPUT: perform_input_instruction,
-            OUTPUT: perform_output_instruction,
+            INPUT: perform_input,
+            OUTPUT: perform_output,
             JUMP_IF_TRUE: perform_jump_if_true,
             JUMP_IF_FALSE: perform_jump_if_false,
             LESS_THAN: perform_less_than,
@@ -83,22 +92,15 @@ class IntcodeComputer:
         }
 
         instruction = self.Instruction(str(self.ints[self.index]))
-        output = 0
         self.opcode = instruction.opcode
         while not self.is_stopped():
-            if output != 0:
-                raise Exception("Output should be 0, but was " + str(self.last_output))
+            if self.last_output != 0:
+                return get_output()
 
-            result = opcode_switcher.get(self.opcode, lambda: "Invalid opcode" + self.opcode)()
-            self.index = result[0]
-            if len(result) == 2:
-                output = result[1]
-                self.last_output = output
-                if self.return_on_output:
-                    return output
-
+            self.index = opcode_switcher.get(self.opcode, lambda: "Invalid opcode" + self.opcode)()
             instruction = self.Instruction(str(self.ints[self.index]))
             self.opcode = instruction.opcode
+
         return self.last_output
 
 
