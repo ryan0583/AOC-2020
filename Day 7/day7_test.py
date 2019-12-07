@@ -10,4 +10,3 @@ class Test(unittest.TestCase):
 
     def test_part2(self):
         self.assertEqual(19581200, part2())
-

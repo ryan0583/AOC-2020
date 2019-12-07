@@ -7,7 +7,10 @@ def get_all_phase_sequences(phases):
             if phase in phase_sequence:
                 continue
             phase_sequence.append(phase)
-            _phase_sequences.append(list(phase_sequence)) if len(phase_sequence) == 5 else add_all_phase_sequences()
+            if len(phase_sequence) == len(phases):
+                _phase_sequences.append(list(phase_sequence))
+            else:
+                add_all_phase_sequences()
             phase_sequence.remove(phase)
 
     _phase_sequences = []
@@ -22,9 +25,9 @@ def process(phase_sequences):
         amps = []
         for phase in phase_sequence:
             amps.append(IntcodeComputer([phase], ints, True))
-        while not amps[len(amps) - 1].is_stopped():
+        while amps[len(amps) - 1].is_running():
             for amp in amps:
-                amp.append_input_val(last_output)
+                amp.append_input(last_output)
                 last_output = amp.process()
 
         return last_output
