@@ -35,52 +35,65 @@ class Instruction:
         return self.opcode + ", " + self.param1_mode + ", " + self.param2_mode
 
 
-def process(input_val, ints):
+class InputCounter:
+    def __init__(self, input_count):
+        self.input_count = input_count
+
+    def increment_count(self):
+        self.input_count += 1
+
+    def get_input_count(self):
+        return self.input_count
+
+def process(input_vals, ints):
     def get_val(param_mode, value):
         param_mode_switcher = {
-            PARAM_MODE_LOOKUP: lambda: ints[value],
+            PARAM_MODE_LOOKUP: lambda: _ints[value],
             PARAM_MODE_DIRECT: lambda: value
         }
         return param_mode_switcher.get(param_mode, lambda: "Invalid param mode" + param_mode)()
 
     def get_values():
-        return (get_val(instruction.get_param1_mode(), ints[index + 1]),
-                get_val(instruction.get_param2_mode(), ints[index + 2]))
+        return (get_val(instruction.get_param1_mode(), _ints[index + 1]),
+                get_val(instruction.get_param2_mode(), _ints[index + 2]))
 
     def perform_input_instruction():
-        ints[ints[index + 1]] = input_val
+        _ints[_ints[index + 1]] = input_vals[input_counter.get_input_count()]
+        input_counter.increment_count()
         return index + 2,
 
     def perform_add():
         values = get_values()
-        ints[ints[index + 3]] = values[0] + values[1]
+        _ints[_ints[index + 3]] = values[0] + values[1]
         return index + 4,
 
     def perform_multiply():
         values = get_values()
-        ints[ints[index + 3]] = values[0] * values[1]
+        _ints[_ints[index + 3]] = values[0] * values[1]
         return index + 4,
 
     def perform_jump_if_true():
-        val1 = get_val(instruction.param1_mode, ints[index + 1])
-        return get_val(instruction.param2_mode, ints[index + 2]) if val1 != 0 else index + 3,
+        val1 = get_val(instruction.param1_mode, _ints[index + 1])
+        return get_val(instruction.param2_mode, _ints[index + 2]) if val1 != 0 else index + 3,
 
     def perform_jump_if_false():
-        val1 = get_val(instruction.param1_mode, ints[index + 1])
-        return get_val(instruction.param2_mode, ints[index + 2]) if val1 == 0 else index + 3,
+        val1 = get_val(instruction.param1_mode, _ints[index + 1])
+        return get_val(instruction.param2_mode, _ints[index + 2]) if val1 == 0 else index + 3,
 
     def perform_less_than():
         values = get_values()
-        ints[ints[index + 3]] = 1 if values[0] < values[1] else 0
+        _ints[_ints[index + 3]] = 1 if values[0] < values[1] else 0
         return index + 4,
 
     def perform_equals():
         values = get_values()
-        ints[ints[index + 3]] = 1 if values[0] == values[1] else 0
+        _ints[_ints[index + 3]] = 1 if values[0] == values[1] else 0
         return index + 4,
 
     def perform_output_instruction():
-        return index + 2, get_val(instruction.get_param1_mode(), ints[index + 1])
+        return index + 2, get_val(instruction.get_param1_mode(), _ints[index + 1])
+
+    _ints = list(ints)
 
     opcode_switcher = {
         ADD: perform_add,
@@ -95,7 +108,8 @@ def process(input_val, ints):
 
     index = 0
     last_output = 0
-    instruction = Instruction.get_instruction(str(ints[index]))
+    input_counter = InputCounter(0)
+    instruction = Instruction.get_instruction(str(_ints[index]))
     opcode = instruction.get_opcode()
     while opcode != STOP:
         if last_output != 0:
@@ -106,7 +120,7 @@ def process(input_val, ints):
         if len(result) == 2:
             last_output = result[1]
 
-        instruction = Instruction.get_instruction(str(ints[index]))
+        instruction = Instruction.get_instruction(str(_ints[index]))
         opcode = instruction.get_opcode()
     return last_output
 
