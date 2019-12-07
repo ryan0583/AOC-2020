@@ -16,46 +16,32 @@ def get_all_phase_sequences(phases):
     return _phase_sequences
 
 
-def find_part1_result(phase_sequence, ints):
-    last_output = 0
+def process(phase_sequences):
+    def find_result():
+        last_output = 0
+        amps = []
+        for phase in phase_sequence:
+            amps.append(IntcodeComputer([phase], ints, True))
+        while not amps[len(amps) - 1].is_stopped():
+            for amp in amps:
+                amp.append_input_val(last_output)
+                last_output = amp.process()
 
-    for phase in phase_sequence:
-        last_amp = IntcodeComputer([phase, last_output], ints, True)
-        last_output = last_amp.process()
+        return last_output
 
-    return last_output
-
-
-def find_part2_result(phase_sequence, ints):
-    last_output = 0
-    amps = [IntcodeComputer([phase_sequence[0]], ints, True),
-            IntcodeComputer([phase_sequence[1]], ints, True),
-            IntcodeComputer([phase_sequence[2]], ints, True),
-            IntcodeComputer([phase_sequence[3]], ints, True),
-            IntcodeComputer([phase_sequence[4]], ints, True)]
-    while not amps[4].is_stopped():
-        for amp in amps:
-            amp.append_input_val(last_output)
-            last_output = amp.process()
-
-    return last_output
-
-
-def process(find_result, phases):
     file = open("input.txt", "r")
     ints = list(map(int, file.read().split(",")))
-    phase_sequences = get_all_phase_sequences(phases)
     max_output = 0
     for phase_sequence in phase_sequences:
-        output = find_result(phase_sequence, ints)
+        output = find_result()
         if output > max_output:
             max_output = output
     return max_output
 
 
 def part1():
-    return process(find_part1_result, [0, 1, 2, 3, 4])
+    return process(get_all_phase_sequences([0, 1, 2, 3, 4]))
 
 
 def part2():
-    return process(find_part2_result, [5, 6, 7, 8, 9])
+    return process(get_all_phase_sequences([5, 6, 7, 8, 9]))
