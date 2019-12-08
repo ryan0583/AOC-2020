@@ -41,13 +41,16 @@ class ImageByteProcessor:
         while start_index < len(self.__all_pixels):
             end_layer_index = start_index + self.__width * self.__height
             layer = process_layer()
-            self.layers.append(layer)
+            self.__layers.append(layer)
             start_index += len(layer.pixels)
 
     def __get_min_white_layer(self):
-        layer_white_counts = map(lambda layer: layer.pixels.count(WHITE), self.layers)
-        min_val, min_index = min((white_count, index) for index, white_count in enumerate(layer_white_counts))
-        return self.layers[min_index]
+        def get_white_count(layer):
+            return layer.pixels.count(WHITE)
+
+        layer_white_counts = map(get_white_count, self.__layers)
+        min_count, min_index = min((white_count, index) for index, white_count in enumerate(layer_white_counts))
+        return self.__layers[min_index]
 
     def get_black_transparent_count_of_min_white_layer(self):
         self.__process_layers()
@@ -58,7 +61,7 @@ class ImageByteProcessor:
 
         for i in range(0, self.__width * self.__height):
             final_pixel = None
-            for layer in self.layers:
+            for layer in self.__layers:
                 final_pixel = layer.pixels[i]
                 if final_pixel != TRANSPARENT:
                     break
