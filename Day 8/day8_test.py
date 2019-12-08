@@ -9,4 +9,11 @@ class Test(unittest.TestCase):
         self.assertEqual(1206, part1())
 
     def test_part2(self):
-        self.assertEqual(19581200, part2())
+        expected = \
+              "########      ####  ######      ####    ######    \n" \
+            + "##              ##  ##    ##  ##    ##  ##    ##  \n" \
+            + "######          ##  ##    ##  ##        ##    ##  \n" \
+            + "##              ##  ######    ##  ####  ######    \n" \
+            + "##        ##    ##  ##  ##    ##    ##  ##        \n" \
+            + "########    ####    ##    ##    ######  ##        \n"
+        self.assertEqual(expected, part2())
