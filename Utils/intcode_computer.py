@@ -1,5 +1,5 @@
 class IntcodeComputer:
-    class Instruction:
+    class __Instruction:
         def __init__(self, value):
             self.opcode = value[len(value) - 2:] if len(value) > 1 else "0" + value[len(value) - 1:]
             self.param1_mode = value[len(value) - 3:len(value) - 2] if len(value) > 2 else PARAM_MODE_LOOKUP
@@ -92,12 +92,12 @@ class IntcodeComputer:
             EQUALS: perform_equals
         }
 
-        next_instruction = self.Instruction(str(self.ints[self.index]))
+        next_instruction = self.__Instruction(str(self.ints[self.index]))
         self.opcode = next_instruction.opcode
         while self.is_running():
             self.index = opcode_switcher.get(self.opcode, lambda: "Invalid opcode" + self.opcode)()
 
-            next_instruction = self.Instruction(str(self.ints[self.index]))
+            next_instruction = self.__Instruction(str(self.ints[self.index]))
 
             if should_return_output():
                 break
