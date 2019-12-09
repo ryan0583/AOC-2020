@@ -38,25 +38,20 @@ class IntcodeComputer:
         def read_value_at_position(value):
             return self.ints[value] if value < len(self.ints) else 0
 
-        def read_value(param_mode, param):
-            param_mode_switcher = {
-                PARAM_MODE_DIRECT: lambda: param,
-                PARAM_MODE_POSITION: lambda: read_value_at_position(param),
-                PARAM_MODE_RELATIVE: lambda: read_value_at_position(param + self.rel_offset)
-            }
-            return param_mode_switcher.get(param_mode, lambda: debug_tools.raise_("Invalid param mode" + param_mode))()
-
-        def read_values():
-            return (read_value(next_instruction.param1_mode, self.ints[self.index + 1]),
-                    read_value(next_instruction.param2_mode, self.ints[self.index + 2]))
-
-        def get_write_index(param_mode, index):
+        def get_index(param_mode, index):
             param_mode_switcher = {
                 PARAM_MODE_DIRECT: lambda: index,
                 PARAM_MODE_POSITION: lambda: self.ints[index],
                 PARAM_MODE_RELATIVE: lambda: self.ints[index] + self.rel_offset
             }
             return param_mode_switcher.get(param_mode, lambda: debug_tools.raise_("Invalid param mode" + param_mode))()
+
+        def read_value(param_mode, index):
+            return read_value_at_position(get_index(param_mode, index))
+
+        def read_values():
+            return (read_value(next_instruction.param1_mode, self.index + 1),
+                    read_value(next_instruction.param2_mode, self.index + 2))
 
         def add(val1, val2):
             return val1 + val2
@@ -70,17 +65,18 @@ class IntcodeComputer:
         def equals(val1, val2):
             return 1 if val1 == val2 else 0
 
-        def get_write_index_and_grow():
-            write_index = get_write_index(next_instruction.param3_mode, self.index + 3)
+        def get_write_index_and_grow(param_mode, index):
+            write_index = get_index(param_mode, index)
             grow_list(write_index)
             return write_index
 
         def perform_logic_and_write(func):
-            self.ints[get_write_index_and_grow()] = func(*read_values())
+            write_index = get_write_index_and_grow(next_instruction.param3_mode, self.index + 3)
+            self.ints[write_index] = func(*read_values())
             return self.index + 4
 
         def perform_input():
-            write_index = get_write_index_and_grow()
+            write_index = get_write_index_and_grow(next_instruction.param1_mode, self.index + 1)
             self.ints[write_index] = self.inputs[self.input_count]
             self.input_count += 1
             return self.index + 2
@@ -106,11 +102,11 @@ class IntcodeComputer:
             return perform_logic_and_write(equals)
 
         def perform_output():
-            self.last_output = read_value(next_instruction.param1_mode, self.ints[self.index + 1])
+            self.last_output = read_value(next_instruction.param1_mode, self.index + 1)
             return self.index + 2
 
         def perform_adjust_rel_offset():
-            self.rel_offset += read_value(next_instruction.param1_mode, self.ints[self.index + 1])
+            self.rel_offset += read_value(next_instruction.param1_mode, self.index + 1)
             return self.index + 2
 
         def should_return_output():

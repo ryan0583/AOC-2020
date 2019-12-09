@@ -1,39 +1,24 @@
+from Utils.intcode_computer import IntcodeComputer
+
+
 def calculate_output(noun, verb):
-    local_ints = list(ints)
-    local_ints[1] = noun
-    local_ints[2] = verb
-    index = 0
-    opcode = local_ints[index]
-    while opcode != 99:
-        index1 = local_ints[index + 1]
-        index2 = local_ints[index + 2]
-        index3 = local_ints[index + 3]
-        val1 = local_ints[index1]
-        val2 = local_ints[index2]
-        if opcode == 1:
-            val = val1 + val2
-        else:
-            val = val1 * val2
-        local_ints[index3] = val
-        index = index + 4
-        opcode = local_ints[index]
-    return local_ints[0]
+    intcode_computer = IntcodeComputer([], "input.txt", False)
+    intcode_computer.ints[1] = noun
+    intcode_computer.ints[2] = verb
+    intcode_computer.process()
+    return intcode_computer.ints[0]
 
 
-def part_one():
-    print(calculate_output(12, 2))
+def part1():
+    return calculate_output(12, 2)
 
 
-def part_two():
+def part2():
     exp = 19690720
+    output = None
     for noun in range(100):
         for verb in range(100):
             if calculate_output(noun, verb) == exp:
-                print(100 * noun + verb)
+                output = 100 * noun + verb
                 break
-
-
-file = open("input.txt", "r")
-ints = list(map(int, file.read().split(",")))
-part_one()
-part_two()
+    return output

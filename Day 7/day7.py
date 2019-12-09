@@ -2,29 +2,30 @@ from Utils.intcode_computer import IntcodeComputer
 
 
 def get_all_phase_sequences(phases):
-    def add_all_phase_sequences():
-        for phase in phases:
-            if phase in phase_sequence:
-                continue
-            phase_sequence.append(phase)
-            if len(phase_sequence) == len(phases):
-                _phase_sequences.append(list(phase_sequence))
-            else:
-                add_all_phase_sequences()
-            phase_sequence.remove(phase)
+    def process_phase(phase):
+        if phase in phase_sequence:
+            return
+        phase_sequence.append(phase)
+        if len(phase_sequence) == len(phases):
+            phase_sequences.append(list(phase_sequence))
+        else:
+            add_all_phase_sequences()
+        phase_sequence.remove(phase)
 
-    _phase_sequences = []
+    def add_all_phase_sequences():
+        return list(map(process_phase, phases))
+
+    phase_sequences = []
     phase_sequence = []
     add_all_phase_sequences()
-    return _phase_sequences
+    return phase_sequences
 
 
 def process(phase_sequences):
-    def find_result():
+    def find_result(phase_sequence):
         last_output = 0
-        amps = []
-        for phase in phase_sequence:
-            amps.append(IntcodeComputer([phase], "input.txt", True))
+        amps = list(map(lambda phase: IntcodeComputer([phase], "input.txt", True), phase_sequence))
+
         while amps[len(amps) - 1].is_running():
             for amp in amps:
                 amp.append_input(last_output)
@@ -32,12 +33,7 @@ def process(phase_sequences):
 
         return last_output
 
-    max_output = 0
-    for phase_sequence in phase_sequences:
-        output = find_result()
-        if output > max_output:
-            max_output = output
-    return max_output
+    return max(map(find_result, phase_sequences))
 
 
 def part1():
