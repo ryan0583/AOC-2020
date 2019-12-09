@@ -9,3 +9,7 @@ def print_grid(debug, grid):
 
 def create_grid(x_dimension, y_dimension):
     return [x[:] for x in [["."] * x_dimension] * y_dimension]
+
+
+def raise_(ex):
+    raise ex

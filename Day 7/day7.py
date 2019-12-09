@@ -24,7 +24,7 @@ def process(phase_sequences):
         last_output = 0
         amps = []
         for phase in phase_sequence:
-            amps.append(IntcodeComputer([phase], ints, True))
+            amps.append(IntcodeComputer([phase], "input.txt", True))
         while amps[len(amps) - 1].is_running():
             for amp in amps:
                 amp.append_input(last_output)
@@ -32,8 +32,6 @@ def process(phase_sequences):
 
         return last_output
 
-    file = open("input.txt", "r")
-    ints = list(map(int, file.read().split(",")))
     max_output = 0
     for phase_sequence in phase_sequences:
         output = find_result()

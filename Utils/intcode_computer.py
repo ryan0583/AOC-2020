@@ -1,10 +1,13 @@
+from Utils import debug_tools
+
+
 class IntcodeComputer:
     class __Instruction:
         def __init__(self, value):
             self.opcode = value[len(value) - 2:] if len(value) > 1 else "0" + value[len(value) - 1:]
-            self.param1_mode = value[len(value) - 3:len(value) - 2] if len(value) > 2 else PARAM_MODE_LOOKUP
-            self.param2_mode = value[len(value) - 4:len(value) - 3] if len(value) > 3 else PARAM_MODE_LOOKUP
-            self.param3_mode = value[len(value) - 5:len(value) - 4] if len(value) > 4 else PARAM_MODE_DIRECT
+            self.param1_mode = value[len(value) - 3:len(value) - 2] if len(value) > 2 else PARAM_MODE_POSITION
+            self.param2_mode = value[len(value) - 4:len(value) - 3] if len(value) > 3 else PARAM_MODE_POSITION
+            self.param3_mode = value[len(value) - 5:len(value) - 4] if len(value) > 4 else PARAM_MODE_POSITION
 
         def is_stop(self):
             return self.opcode == STOP
@@ -12,8 +15,8 @@ class IntcodeComputer:
         def __str__(self):
             return self.opcode + ", " + self.param1_mode + ", " + self.param2_mode + ", " + self.param3_mode
 
-    def __init__(self, inputs, ints, return_on_output):
-        self.ints = list(ints)
+    def __init__(self, inputs, file_name, return_on_output):
+        self.ints = list(map(int, open(file_name, "r").read().split(",")))
         self.inputs = list(inputs)
         self.index = 0
         self.return_on_output = return_on_output
@@ -32,86 +35,82 @@ class IntcodeComputer:
         def grow_list(new_size):
             self.ints += [0] * (new_size - len(self.ints) + 1)
 
-        def get_val_lookup(value):
+        def read_value_at_position(value):
             return self.ints[value] if value < len(self.ints) else 0
 
-        def get_val(param_mode, value):
-            def get_val_relative():
-                return get_val_lookup(value + self.rel_offset)
-
+        def read_value(param_mode, param):
             param_mode_switcher = {
-                PARAM_MODE_LOOKUP: lambda: get_val_lookup(value),
-                PARAM_MODE_DIRECT: lambda: value,
-                PARAM_MODE_RELATIVE: get_val_relative
+                PARAM_MODE_DIRECT: lambda: param,
+                PARAM_MODE_POSITION: lambda: read_value_at_position(param),
+                PARAM_MODE_RELATIVE: lambda: read_value_at_position(param + self.rel_offset)
             }
-            return param_mode_switcher.get(param_mode, lambda: "Invalid param mode" + param_mode)()
+            return param_mode_switcher.get(param_mode, lambda: debug_tools.raise_("Invalid param mode" + param_mode))()
 
-        def get_values():
-            return (get_val(next_instruction.param1_mode, self.ints[self.index + 1]),
-                    get_val(next_instruction.param2_mode, self.ints[self.index + 2]))
+        def read_values():
+            return (read_value(next_instruction.param1_mode, self.ints[self.index + 1]),
+                    read_value(next_instruction.param2_mode, self.ints[self.index + 2]))
+
+        def get_write_index(param_mode, index):
+            param_mode_switcher = {
+                PARAM_MODE_DIRECT: lambda: index,
+                PARAM_MODE_POSITION: lambda: self.ints[index],
+                PARAM_MODE_RELATIVE: lambda: self.ints[index] + self.rel_offset
+            }
+            return param_mode_switcher.get(param_mode, lambda: debug_tools.raise_("Invalid param mode" + param_mode))()
+
+        def add(val1, val2):
+            return val1 + val2
+
+        def multiply(val1, val2):
+            return val1 * val2
+
+        def less_than(val1, val2):
+            return 1 if val1 < val2 else 0
+
+        def equals(val1, val2):
+            return 1 if val1 == val2 else 0
+
+        def get_write_index_and_grow():
+            write_index = get_write_index(next_instruction.param3_mode, self.index + 3)
+            grow_list(write_index)
+            return write_index
+
+        def perform_logic_and_write(func):
+            self.ints[get_write_index_and_grow()] = func(*read_values())
+            return self.index + 4
 
         def perform_input():
-            lookup_index = self.ints[self.index + 1]
-            if next_instruction.param1_mode == PARAM_MODE_RELATIVE:
-                lookup_index += self.rel_offset
-
-            grow_list(lookup_index)
-            self.ints[lookup_index] = self.inputs[self.input_count]
+            write_index = get_write_index_and_grow()
+            self.ints[write_index] = self.inputs[self.input_count]
             self.input_count += 1
             return self.index + 2
 
         def perform_add():
-            values = get_values()
-            lookup_index = self.ints[self.index + 3]
-            if next_instruction.param3_mode == PARAM_MODE_RELATIVE:
-                lookup_index += self.rel_offset
-            grow_list(lookup_index)
-            self.ints[lookup_index] = values[0] + values[1]
-            return self.index + 4
+            return perform_logic_and_write(add)
 
         def perform_multiply():
-            values = get_values()
-            lookup_index = self.ints[self.index + 3]
-            if next_instruction.param3_mode == PARAM_MODE_RELATIVE:
-                lookup_index += self.rel_offset
-            grow_list(lookup_index)
-            self.ints[lookup_index] = values[0] * values[1]
-            return self.index + 4
+            return perform_logic_and_write(multiply)
 
         def perform_jump_if_true():
-            val1 = get_val(next_instruction.param1_mode, self.ints[self.index + 1])
-            return get_val(next_instruction.param2_mode, self.ints[self.index + 2]) if val1 != 0 else self.index + 3
+            val1, val2 = read_values()
+            return val2 if val1 != 0 else self.index + 3
 
         def perform_jump_if_false():
-            val1 = get_val(next_instruction.param1_mode, self.ints[self.index + 1])
-            return get_val(next_instruction.param2_mode, self.ints[self.index + 2]) if val1 == 0 else self.index + 3
+            val1, val2 = read_values()
+            return val2 if val1 == 0 else self.index + 3
 
         def perform_less_than():
-            values = get_values()
-            lookup_index = self.ints[self.index + 3]
-            if next_instruction.param3_mode == PARAM_MODE_RELATIVE:
-                lookup_index += self.rel_offset
-            grow_list(lookup_index)
-            self.ints[lookup_index] = 1 if values[0] < values[1] else 0
-            return self.index + 4
+            return perform_logic_and_write(less_than)
 
         def perform_equals():
-            values = get_values()
-            lookup_index = self.ints[self.index + 3]
-            if next_instruction.param3_mode == PARAM_MODE_RELATIVE:
-                lookup_index += self.rel_offset
-            grow_list(lookup_index)
-            self.ints[lookup_index] = 1 if values[0] == values[1] else 0
-            return self.index + 4
+            return perform_logic_and_write(equals)
 
         def perform_output():
-            self.last_output = get_val(next_instruction.param1_mode, self.ints[self.index + 1])
-            print(self.last_output)
+            self.last_output = read_value(next_instruction.param1_mode, self.ints[self.index + 1])
             return self.index + 2
 
         def perform_adjust_rel_offset():
-            self.rel_offset += get_val(next_instruction.param1_mode, self.ints[self.index + 1])
-            # print(self.rel_offset)
+            self.rel_offset += read_value(next_instruction.param1_mode, self.ints[self.index + 1])
             return self.index + 2
 
         def should_return_output():
@@ -135,19 +134,15 @@ class IntcodeComputer:
         next_instruction = self.__Instruction(str(self.ints[self.index]))
         self.opcode = next_instruction.opcode
         while self.is_running():
-            # print(self.index)
-            # print(self.ints)
-            self.index = opcode_switcher.get(self.opcode, lambda: print("Invalid opcode" + self.opcode))()
-
-            # print(self.opcode)
-            # print(self.last_output)
+            self.index = opcode_switcher.get(self.opcode,
+                                             lambda: debug_tools.raise_(Exception("Invalid opcode" + self.opcode)))()
 
             next_instruction = self.__Instruction(str(self.ints[self.index]))
 
             if should_return_output():
                 break
-            # if invalid_output():
-            # raise Exception("Expected last output to be 0, but was " + str(self.last_output))
+            if invalid_output():
+                raise Exception("Expected last output to be 0, but was " + str(self.last_output))
 
             self.opcode = next_instruction.opcode
 
@@ -165,6 +160,6 @@ EQUALS = "08"
 ADJUST_REL_OFFSET = "09"
 STOP = "99"
 
-PARAM_MODE_LOOKUP = "0"
+PARAM_MODE_POSITION = "0"
 PARAM_MODE_DIRECT = "1"
 PARAM_MODE_RELATIVE = "2"
