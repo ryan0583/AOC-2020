@@ -27,20 +27,20 @@ def find_asteroids(lines):
 def find_angle(x, y):
     if x == 0:
         angle = 0
-        if y < 0:
+        if y > 0:
             angle = 180
     elif y == 0:
         angle = 90
         if x < 0:
             angle = 270
     else:
-        angle = degrees(atan(abs(y) / abs(x))) if y > 0 else degrees(atan(abs(x) / abs(y)))
+        angle = degrees(atan(abs(y) / abs(x))) if y < 0 else degrees(atan(abs(x) / abs(y)))
 
-        if y < 0 < x:
+        if y > 0 and 0 < x:
             angle = 180 - angle
-        elif y < 0 and x < 0:
-            angle += 180
         elif x < 0 < y:
+            angle += 180
+        elif x < 0 and 0 > y:
             angle += 270
 
     return angle
@@ -57,7 +57,7 @@ def find_seen_asteroids(asteroid, asteroids):
             # print(str(asteroid) + " can't see " + str(other_asteroid) + ". Blocked by " + str(seen_asteroid))
             seen_rel_x = seen_asteroid.x - asteroid.x
             seen_rel_y = seen_asteroid.y - asteroid.y
-            is_closer = other_rel_x + other_rel_y < seen_rel_x + seen_rel_y
+            is_closer = abs(other_rel_x) + abs(other_rel_y) < abs(seen_rel_x) + abs(seen_rel_y)
             if is_closer:
                 asteroid.seen_asteroids[key] = other_asteroid
         else:
@@ -123,6 +123,12 @@ def add_next_asteroid(source_asteroid, all_asteroids, vapourised, up, right, ang
     source_asteroid.seen_asteroids.append(find_closest(source_asteroid, asteroids_on_path))
 
 
+def print_map(map):
+    to_print = ""
+    for angle, asteroid in map.items():
+        to_print += "(" + str(angle) + ", " + str(asteroid) + "),"
+    print(to_print)
+
 def part1():
     lines = open("input.txt", "r").read().splitlines()
     # lines = open("testinput.txt", "r").read().splitlines()
@@ -136,6 +142,7 @@ def part2():
     lines = open("input.txt", "r").read().splitlines()
     source_key = "26, 36"
     # lines = open("part2test.txt", "r").read().splitlines()
+    # source_key = "11, 13"
     asteroids = find_asteroids(lines)
     asteroid_positions = list(map(lambda asteroid: (str(asteroid.x) + ", " + str(asteroid.y), asteroid), asteroids))
     asteroid_pos_map = {k: v for (k, v) in asteroid_positions}
@@ -144,12 +151,9 @@ def part2():
     find_seen_asteroids(source_asteroid, asteroids)
     ordered_seen_asteroids = OrderedDict(sorted(source_asteroid.seen_asteroids.items()))
 
-    print(len(asteroids))
-    print(ordered_seen_asteroids)
-
     killed_asteroids = []
 
-    while len(killed_asteroids) < 200:
+    while len(killed_asteroids) < 200 and len(source_asteroid.seen_asteroids) > 0:
         for angle, asteroid in ordered_seen_asteroids.items():
             asteroids.remove(asteroid)
             killed_asteroids.append(asteroid)
@@ -157,11 +161,5 @@ def part2():
         source_asteroid.seen_asteroids = {}
         find_seen_asteroids(source_asteroid, asteroids)
         ordered_seen_asteroids = OrderedDict(sorted(source_asteroid.seen_asteroids.items()))
-        print(len(asteroids))
-        print(ordered_seen_asteroids)
 
-    print(killed_asteroids[len(killed_asteroids) - 1])
-
-
-# print(part1())
-part2()
+    return killed_asteroids[199]
