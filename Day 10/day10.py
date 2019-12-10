@@ -5,7 +5,7 @@ class Asteroid:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.seen_asteroids = []
+        self.seen_asteroids = {}
 
     def get_seen_count(self):
         return len(self.seen_asteroids)
@@ -24,47 +24,50 @@ def find_asteroids(lines):
 
 
 def find_angle(x, y):
-    return degrees(atan(y / x)) if y > 0 else degrees(atan(x / y))
+    if x == 0:
+        angle = 0
+        if y < 0:
+            angle = 180
+    elif y == 0:
+        angle = 90
+        if x < 0:
+            angle = 270
+    else:
+        angle = degrees(atan(abs(y) / abs(x))) if y > 0 else degrees(atan(abs(x) / abs(y)))
+
+        if y < 0 < x:
+            angle = 180 - angle
+        elif y < 0 and x < 0:
+            angle += 180
+        elif x < 0 < y:
+            angle += 270
+
+    return angle
 
 
 def find_seen_asteroids(asteroid, asteroids):
-    def can_see():
+    def add_if_can_see():
         other_rel_x = other_asteroid.x - asteroid.x
         other_rel_y = other_asteroid.y - asteroid.y
 
-        blocked = False
-        for seen_asteroid in asteroid.seen_asteroids:
+        key = find_angle(other_rel_x, other_rel_y)
+        seen_asteroid = asteroid.seen_asteroids.get(key)
+        if seen_asteroid is not None:
+            # print(str(asteroid) + " can't see " + str(other_asteroid) + ". Blocked by " + str(seen_asteroid))
             seen_rel_x = seen_asteroid.x - asteroid.x
             seen_rel_y = seen_asteroid.y - asteroid.y
-
-            same_row = other_rel_y == 0 and seen_rel_y == 0
-            same_col = other_rel_x == 0 and seen_rel_x == 0
-            same_x_dir = (other_rel_x > 0) == (seen_rel_x > 0)
-            same_y_dir = (other_rel_y > 0) == (seen_rel_y > 0)
-
-            if (same_row and same_x_dir) or (same_col and same_y_dir):
-                blocked = True
-            elif other_rel_y != 0 and other_rel_x != 0 and seen_rel_y != 0 and seen_rel_x != 0:
-                same_angle = find_angle(other_rel_x, other_rel_y) == find_angle(seen_rel_x, seen_rel_y)
-                if same_x_dir and same_y_dir and same_angle:
-                    blocked = True
-
-            if blocked:
-                # print(str(asteroid) + " can't see " + str(other_asteroid) + ". Blocked by " + str(seen_asteroid))
-
-                is_closer = other_rel_x + other_rel_y < seen_rel_x + seen_rel_y
-                if is_closer:
-                    asteroid.seen_asteroids.remove(seen_asteroid)
-                    asteroid.seen_asteroids.append(other_asteroid)
-                break
-
-        return not blocked
+            is_closer = other_rel_x + other_rel_y < seen_rel_x + seen_rel_y
+            if is_closer:
+                asteroid.seen_asteroids[key] = other_asteroid
+        else:
+            asteroid.seen_asteroids[key] = other_asteroid
 
     for other_asteroid in asteroids:
         if other_asteroid.x == asteroid.x and other_asteroid.y == asteroid.y:
             continue
-        if can_see():
-            asteroid.seen_asteroids.append(other_asteroid)
+        add_if_can_see()
+
+    print(asteroid)
 
 
 def find_best_asteroid(asteroids):
@@ -132,50 +135,58 @@ def part1():
 
 def part2():
     lines = open("input.txt", "r").read().splitlines()
+    source_key = "26, 36"
     # lines = open("part2test.txt", "r").read().splitlines()
     asteroids = find_asteroids(lines)
-    for i, asteroid in enumerate(asteroids):
-        find_seen_asteroids(asteroid, asteroids)
-        print("done asteroid " + str(i))
+    asteroid_positions = list(map(lambda asteroid: (str(asteroid.x) + ", " + str(asteroid.y), asteroid), asteroids))
+    asteroid_pos_map = {k: v for (k, v) in asteroid_positions}
 
-    source_asteroid = find_best_asteroid(asteroids)
+    source_asteroid = asteroid_pos_map.get(source_key)
+    find_seen_asteroids(source_asteroid, asteroids)
+    # print(source_asteroid)
+    seen_asteroid_angles = list(
+        map(lambda asteroid: (find_angle(asteroid.x - source_asteroid.x, asteroid.y - source_asteroid.y), asteroid),
+            source_asteroid.seen_asteroids))
 
-    print(source_asteroid)
+    asteroid_angle_map = {k: v for (k, v) in seen_asteroid_angles}
+    print(asteroid_angle_map)
 
-    rotation_increment = get_rotation_increment(asteroids)
-
-    print(rotation_increment)
-
-    vapourised = []
-    rotation = 0
-    up = True
-    right = True
-
-    while len(vapourised) < 200:
-        angle = rotation % 45
-        print(up)
-        print(right)
-        print(angle)
-        target_asteroids = find_asteroids_on_path(source_asteroid.seen_asteroids, source_asteroid, up, right, angle)
-        if len(target_asteroids) > 0:
-            print("VAPOURISE!!")
-            vapourised.append(target_asteroids[0])
-            source_asteroid.seen_asteroids.remove(target_asteroids[0])
-            add_next_asteroid(source_asteroid, asteroids, vapourised, up, right, angle)
-
-        rotation += rotation_increment
-        if rotation > 360:
-            rotation = rotation % 360
-            right = True
-        elif rotation > 270:
-            up = True
-        elif rotation > 180:
-            right = False
-        elif rotation > 45:
-            up = False
-
-    print(vapourised[len(vapourised)])
-
+    #
+    # print(source_asteroid)
+    #
+    # rotation_increment = get_rotation_increment(asteroids)
+    #
+    # print(rotation_increment)
+    #
+    # vapourised = []
+    # rotation = 0
+    # up = True
+    # right = True
+    #
+    # while len(vapourised) < 200:
+    #     angle = rotation % 45
+    #     print(up)
+    #     print(right)
+    #     print(angle)
+    #     target_asteroids = find_asteroids_on_path(source_asteroid.seen_asteroids, source_asteroid, up, right, angle)
+    #     if len(target_asteroids) > 0:
+    #         print("VAPOURISE!!")
+    #         vapourised.append(target_asteroids[0])
+    #         source_asteroid.seen_asteroids.remove(target_asteroids[0])
+    #         add_next_asteroid(source_asteroid, asteroids, vapourised, up, right, angle)
+    #
+    #     rotation += rotation_increment
+    #     if rotation > 360:
+    #         rotation = rotation % 360
+    #         right = True
+    #     elif rotation > 270:
+    #         up = True
+    #     elif rotation > 180:
+    #         right = False
+    #     elif rotation > 45:
+    #         up = False
+    #
+    # print(vapourised[len(vapourised)])
 
 # print(part1())
-part2()
+# part2()
