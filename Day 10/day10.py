@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from math import atan, degrees
 
 
@@ -67,7 +68,7 @@ def find_seen_asteroids(asteroid, asteroids):
             continue
         add_if_can_see()
 
-    print(asteroid)
+    # print(asteroid)
 
 
 def find_best_asteroid(asteroids):
@@ -92,15 +93,13 @@ def get_rotation_increment(asteroids):
     return degrees(min(atan(1 / (max_x - min_x)), atan(1 / (max_y - min_y))))
 
 
-def find_asteroids_on_path(asteroids, source_asteroid, up, right, angle):
+def find_asteroids_on_path(asteroids, source_asteroid, angle):
     on_path = []
     for asteroid in asteroids:
         y_dist = asteroid.y - source_asteroid.y
         x_dist = asteroid.x - source_asteroid.x
-        asteroid_up = y_dist > 0
-        asteroid_right = x_dist > 0
-        asteroid_angle = find_angle(x_dist, y_dist) if x_dist != 0 and y_dist != 0 else 0
-        if up == asteroid_up and right == asteroid_right and asteroid_angle == angle:
+        asteroid_angle = find_angle(x_dist, y_dist)
+        if asteroid_angle == angle:
             on_path.append(asteroid)
     return on_path
 
@@ -143,50 +142,26 @@ def part2():
 
     source_asteroid = asteroid_pos_map.get(source_key)
     find_seen_asteroids(source_asteroid, asteroids)
-    # print(source_asteroid)
-    seen_asteroid_angles = list(
-        map(lambda asteroid: (find_angle(asteroid.x - source_asteroid.x, asteroid.y - source_asteroid.y), asteroid),
-            source_asteroid.seen_asteroids))
+    ordered_seen_asteroids = OrderedDict(sorted(source_asteroid.seen_asteroids.items()))
 
-    asteroid_angle_map = {k: v for (k, v) in seen_asteroid_angles}
-    print(asteroid_angle_map)
+    print(len(asteroids))
+    print(ordered_seen_asteroids)
 
-    #
-    # print(source_asteroid)
-    #
-    # rotation_increment = get_rotation_increment(asteroids)
-    #
-    # print(rotation_increment)
-    #
-    # vapourised = []
-    # rotation = 0
-    # up = True
-    # right = True
-    #
-    # while len(vapourised) < 200:
-    #     angle = rotation % 45
-    #     print(up)
-    #     print(right)
-    #     print(angle)
-    #     target_asteroids = find_asteroids_on_path(source_asteroid.seen_asteroids, source_asteroid, up, right, angle)
-    #     if len(target_asteroids) > 0:
-    #         print("VAPOURISE!!")
-    #         vapourised.append(target_asteroids[0])
-    #         source_asteroid.seen_asteroids.remove(target_asteroids[0])
-    #         add_next_asteroid(source_asteroid, asteroids, vapourised, up, right, angle)
-    #
-    #     rotation += rotation_increment
-    #     if rotation > 360:
-    #         rotation = rotation % 360
-    #         right = True
-    #     elif rotation > 270:
-    #         up = True
-    #     elif rotation > 180:
-    #         right = False
-    #     elif rotation > 45:
-    #         up = False
-    #
-    # print(vapourised[len(vapourised)])
+    killed_asteroids = []
+
+    while len(killed_asteroids) < 200:
+        for angle, asteroid in ordered_seen_asteroids.items():
+            asteroids.remove(asteroid)
+            killed_asteroids.append(asteroid)
+
+        source_asteroid.seen_asteroids = {}
+        find_seen_asteroids(source_asteroid, asteroids)
+        ordered_seen_asteroids = OrderedDict(sorted(source_asteroid.seen_asteroids.items()))
+        print(len(asteroids))
+        print(ordered_seen_asteroids)
+
+    print(killed_asteroids[len(killed_asteroids) - 1])
+
 
 # print(part1())
-# part2()
+part2()
