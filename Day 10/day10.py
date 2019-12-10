@@ -2,6 +2,7 @@ from collections import OrderedDict
 from math import atan, degrees
 
 from Utils.file_parser import FileParser
+from Utils.debug_tools import raise_
 
 
 class Asteroid:
@@ -28,25 +29,43 @@ def find_asteroids():
 
 
 def find_angle(x, y):
-    if x == 0:
-        angle = 0
-        if y > 0:
-            angle = 180
-    elif y == 0:
-        angle = 90
-        if x < 0:
-            angle = 270
-    else:
-        angle = degrees(atan(abs(y) / abs(x))) if y < 0 else degrees(atan(abs(x) / abs(y)))
+    def find_vertical_angle():
+        return 180 if y > 0 else 0
 
+    def find_horiz_angle():
+        return 90 if x > 0 else 270
+
+    def get_up_angle():
+        return degrees(atan(abs(y) / abs(x)))
+
+    def get_down_angle():
+        return degrees(atan(abs(x) / abs(y)))
+
+    def get_quadrant():
+        if y < 0 < x:
+            return TOP_RIGHT
         if y > 0 and 0 < x:
-            angle = 180 - angle
-        elif x < 0 < y:
-            angle += 180
-        elif x < 0 and 0 > y:
-            angle += 270
+            return BOTTOM_RIGHT
+        if y > 0 > x:
+            return BOTTOM_LEFT
+        if y < 0 and 0 > x:
+            return TOP_LEFT
 
-    return angle
+    if x == 0:
+        return find_vertical_angle()
+    elif y == 0:
+        return find_horiz_angle()
+    else:
+        angle = get_up_angle() if y < 0 else get_down_angle()
+
+        quadrant_switcher = {
+            TOP_RIGHT: lambda: angle,
+            BOTTOM_RIGHT: lambda: 180 - angle,
+            BOTTOM_LEFT: lambda: angle + 180,
+            TOP_LEFT: lambda: angle + 270
+        }
+
+        return quadrant_switcher.get(get_quadrant(), lambda: raise_(Exception("Invalid quadrant")))()
 
 
 def find_seen_asteroids(asteroid, asteroids):
@@ -63,11 +82,15 @@ def find_seen_asteroids(asteroid, asteroids):
 
         key = find_angle(other_rel_x, other_rel_y)
         seen_asteroid = asteroid.seen_asteroids.get(key)
-        asteroid.seen_asteroids[key] = other_asteroid if seen_asteroid is None else replace_if_closer()
+        if seen_asteroid is None:
+            asteroid.seen_asteroids[key] = other_asteroid
+        else:
+            replace_if_closer()
+
+    x = asteroid.get_x()
+    y = asteroid.get_y()
 
     for other_asteroid in asteroids:
-        x = asteroid.get_x()
-        y = asteroid.get_y()
         other_x = other_asteroid.get_x()
         other_y = other_asteroid.get_y()
         if other_x != x or other_y != y:
@@ -102,7 +125,7 @@ def part2():
     asteroids = create_asteroids()
     source_asteroid = find_best_asteroid(asteroids)
 
-    ordered_seen_asteroids = find_seen_asteroids(source_asteroid, asteroids)
+    ordered_seen_asteroids = OrderedDict(sorted(source_asteroid.seen_asteroids.items()))
     killed_asteroids = []
 
     while len(killed_asteroids) < 200:
@@ -114,3 +137,9 @@ def part2():
         ordered_seen_asteroids = find_seen_asteroids(source_asteroid, asteroids)
 
     return killed_asteroids[199]
+
+
+TOP_RIGHT = "TR"
+BOTTOM_RIGHT = "BR"
+BOTTOM_LEFT = "BL"
+TOP_LEFT = "TL"

@@ -9,4 +9,4 @@ class Test(unittest.TestCase):
         self.assertEqual("26, 36: 347", str(part1()))
 
     def test_part2(self):
-         self.assertEqual("8, 29: 318", str(part2()))
+        self.assertEqual("8, 29: 318", str(part2()))
