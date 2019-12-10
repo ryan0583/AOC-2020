@@ -1,27 +1,30 @@
 from collections import OrderedDict
 from math import atan, degrees
 
+from Utils.file_parser import FileParser
+
 
 class Asteroid:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, point):
+        self.point = point
         self.seen_asteroids = {}
+
+    def get_x(self):
+        return self.point.x
+
+    def get_y(self):
+        return self.point.y
 
     def get_seen_count(self):
         return len(self.seen_asteroids)
 
     def __str__(self):
-        return str(self.x) + ", " + str(self.y) + ": " + str(len(self.seen_asteroids))
+        return str(self.point) + ": " + str(len(self.seen_asteroids))
 
 
-def find_asteroids(lines):
-    asteroids = []
-    for y, line in enumerate(lines):
-        for x, char in enumerate(line):
-            if char == "#":
-                asteroids.append(Asteroid(x, y))
-    return asteroids
+def find_asteroids():
+    file_parser = FileParser("input.txt")
+    return list(map(Asteroid, file_parser.read_points("#")))
 
 
 def find_angle(x, y):
@@ -49,32 +52,32 @@ def find_angle(x, y):
 def find_seen_asteroids(asteroid, asteroids):
     def add_if_can_see():
         def replace_if_closer():
-            seen_rel_x = seen_asteroid.x - asteroid.x
-            seen_rel_y = seen_asteroid.y - asteroid.y
+            seen_rel_x = seen_asteroid.get_x() - x
+            seen_rel_y = seen_asteroid.get_y() - y
             is_closer = abs(other_rel_x) + abs(other_rel_y) < abs(seen_rel_x) + abs(seen_rel_y)
             if is_closer:
                 asteroid.seen_asteroids[key] = other_asteroid
 
-        other_rel_x = other_asteroid.x - asteroid.x
-        other_rel_y = other_asteroid.y - asteroid.y
+        other_rel_x = other_x - x
+        other_rel_y = other_y - y
 
         key = find_angle(other_rel_x, other_rel_y)
         seen_asteroid = asteroid.seen_asteroids.get(key)
-        if seen_asteroid is not None:
-            replace_if_closer()
-        else:
-            asteroid.seen_asteroids[key] = other_asteroid
+        asteroid.seen_asteroids[key] = other_asteroid if seen_asteroid is None else replace_if_closer()
 
     for other_asteroid in asteroids:
-        if other_asteroid.x == asteroid.x and other_asteroid.y == asteroid.y:
-            continue
-        add_if_can_see()
+        x = asteroid.get_x()
+        y = asteroid.get_y()
+        other_x = other_asteroid.get_x()
+        other_y = other_asteroid.get_y()
+        if other_x != x or other_y != y:
+            add_if_can_see()
+
     return OrderedDict(sorted(asteroid.seen_asteroids.items()))
 
 
 def create_asteroids():
-    lines = open("input.txt", "r").read().splitlines()
-    asteroids = find_asteroids(lines)
+    asteroids = find_asteroids()
     for asteroid in asteroids:
         find_seen_asteroids(asteroid, asteroids)
     return asteroids
