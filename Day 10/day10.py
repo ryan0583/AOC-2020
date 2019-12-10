@@ -1,3 +1,5 @@
+from math import atan
+
 class Asteroid:
     def __init__(self, x, y):
         self.x = x
@@ -21,6 +23,11 @@ def find_asteroids():
 
 def find_seen_asteroids():
     def can_see():
+        def find_angle(x, y):
+            if y > 0:
+                return atan(y/x) if x != 0 else 0
+            return atan(x/y) if y != 0 else 0
+
         other_rel_x = other_asteroid.x - asteroid.x
         other_rel_y = other_asteroid.y - asteroid.y
 
@@ -31,21 +38,19 @@ def find_seen_asteroids():
 
             same_row = other_rel_y == 0 and seen_rel_y == 0
             same_col = other_rel_x == 0 and seen_rel_x == 0
+            same_x_dir = (other_rel_x > 0) == (seen_rel_x > 0)
+            same_y_dir = (other_rel_y > 0) == (seen_rel_y > 0)
 
-            if same_row or same_col:
+            if (same_row and same_x_dir) or (same_col and same_y_dir):
                 blocked = True
-            else:
-                same_x_dir = (other_rel_x > 0) == (seen_rel_x > 0)
-                same_y_dir = (other_rel_y > 0) == (seen_rel_y > 0)
+            elif other_rel_y != 0 and other_rel_x != 0 and seen_rel_y != 0 and seen_rel_x != 0:
+                same_angle = find_angle(other_rel_x, other_rel_y) == find_angle(seen_rel_x, seen_rel_y)
 
-                same_x_angle = seen_rel_x % other_rel_x == 0 or other_rel_x % seen_rel_x == 0 if seen_rel_x != 0 and other_rel_x != 0 and seen_rel_x != other_rel_x else False
-                same_y_angle = seen_rel_y % other_rel_y == 0 or other_rel_y % seen_rel_y == 0 if seen_rel_y != 0 and other_rel_y != 0 and seen_rel_y != other_rel_y else False
-
-                if same_x_dir and same_x_angle and same_y_dir and same_y_angle:
+                if same_x_dir and same_y_dir and same_angle:
                     blocked = True
 
             if blocked:
-                print(str(asteroid) + " can't see " + str(other_asteroid) + ". Blocked by " + str(seen_asteroid))
+                # print(str(asteroid) + " can't see " + str(other_asteroid) + ". Blocked by " + str(seen_asteroid))
 
                 is_closer = other_rel_x + other_rel_y < seen_rel_x + seen_rel_y
                 if is_closer:
@@ -73,9 +78,11 @@ def find_best_asteroid():
     return best_asteroid
 
 
-# lines = open("input.txt", "r").read().splitlines()
-lines = open("testinput.txt", "r").read().splitlines()
+lines = open("input.txt", "r").read().splitlines()
+# lines = open("testinput.txt", "r").read().splitlines()
 asteroids = find_asteroids()
 for asteroid in asteroids:
     find_seen_asteroids()
-    print(asteroid)
+    # print(asteroid)
+
+print(find_best_asteroid())
