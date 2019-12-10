@@ -29,17 +29,17 @@ def find_seen_asteroids():
             seen_rel_x = seen_asteroid.x - asteroid.x
             seen_rel_y = seen_asteroid.y - asteroid.y
 
-            same_row = other_rel_y == seen_rel_y
-            same_col = other_rel_x == seen_rel_x
+            same_row = other_rel_y == 0 and seen_rel_y == 0
+            same_col = other_rel_x == 0 and seen_rel_x == 0
 
-            if same_row and same_col:
+            if same_row or same_col:
                 blocked = True
             else:
                 same_x_dir = (other_rel_x > 0) == (seen_rel_x > 0)
                 same_y_dir = (other_rel_y > 0) == (seen_rel_y > 0)
 
-                same_x_angle = seen_rel_x % other_rel_x == 0 or other_rel_x % seen_rel_x == 0 if seen_rel_x != 0 and other_rel_x != 0 else False
-                same_y_angle = seen_rel_y % other_rel_y == 0 or other_rel_y % seen_rel_y == 0 if seen_rel_y != 0 and other_rel_y != 0 else False
+                same_x_angle = seen_rel_x % other_rel_x == 0 or other_rel_x % seen_rel_x == 0 if seen_rel_x != 0 and other_rel_x != 0 and seen_rel_x != other_rel_x else False
+                same_y_angle = seen_rel_y % other_rel_y == 0 or other_rel_y % seen_rel_y == 0 if seen_rel_y != 0 and other_rel_y != 0 and seen_rel_y != other_rel_y else False
 
                 if same_x_dir and same_x_angle and same_y_dir and same_y_angle:
                     blocked = True
