@@ -1,3 +1,5 @@
+from Utils.debug_tools import create_grid
+from Utils.debug_tools import print_grid
 from Utils.debug_tools import raise_
 from Utils.intcode_computer import IntcodeComputer
 from Utils.point import Point
@@ -37,12 +39,30 @@ class Panel:
         self.colours = {}
 
     def paint(self, color, position):
-        self.colours[str(position.x) + ", " + str(position.y)] = color
+        self.colours[position.x, position.y] = color
 
     def get_colour(self, position):
-        colour = self.colours.get(str(position.x) + ", " + str(position.y))
+        colour = self.colours.get((position.x, position.y))
         return colour if colour is not None else BLACK
 
+    def print(self):
+        min_x = min(list(map(lambda key: key[0], self.colours.keys())))
+        max_x = max(list(map(lambda key: key[0], self.colours.keys())))
+        min_y = min(list(map(lambda key: key[1], self.colours.keys())))
+        max_y = max(list(map(lambda key: key[1], self.colours.keys())))
+
+        x_dim = max_x - min_x + 1
+        y_dim = max_y - min_y + 1
+
+        grid = create_grid(x_dim, y_dim)
+
+        for position, colour in self.colours.items():
+            x_pos = position[0] - min_x
+            y_pos = position[1] - min_y
+            grid[y_pos][x_pos] = ".." if colour == BLACK else "##"
+
+        print_grid(True, grid)
+
 
 def part1():
     robot = Robot("input.txt")
@@ -59,10 +79,8 @@ def part1():
 
     print(len(panel.colours))
 
-def part1():
-    robot = Robot("input.txt")
-    panel = Panel()
 
+def main_loop(robot, panel):
     while robot.brain.is_running():
         next_input = panel.get_colour(robot.position)
         robot.brain.append_input(next_input)
@@ -72,7 +90,20 @@ def part1():
         robot.turn(next_rotation)
         robot.move()
 
+
+def part1():
+    robot = Robot("input.txt")
+    panel = Panel()
+    main_loop(robot, panel)
     print(len(panel.colours))
+
+
+def part2():
+    robot = Robot("input.txt")
+    panel = Panel()
+    panel.paint(WHITE, robot.position)
+    main_loop(robot, panel)
+    panel.print()
 
 
 BLACK = 0
@@ -87,3 +118,4 @@ DOWN = 2
 LEFT = 3
 
 part1()
+# part2()
