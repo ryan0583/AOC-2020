@@ -1,5 +1,5 @@
 from Utils.debug_tools import create_grid
-from Utils.debug_tools import print_grid
+from Utils.debug_tools import render_grid
 from Utils.debug_tools import raise_
 from Utils.intcode_computer import IntcodeComputer
 from Utils.point import Point
@@ -45,7 +45,7 @@ class Panel:
         colour = self.colours.get((position.x, position.y))
         return colour if colour is not None else BLACK
 
-    def print(self):
+    def render(self):
         min_x = min(list(map(lambda key: key[0], self.colours.keys())))
         max_x = max(list(map(lambda key: key[0], self.colours.keys())))
         min_y = min(list(map(lambda key: key[1], self.colours.keys())))
@@ -61,7 +61,7 @@ class Panel:
             y_pos = position[1] - min_y
             grid[y_pos][x_pos] = ".." if colour == BLACK else "##"
 
-        print_grid(True, grid)
+        return render_grid(grid)
 
 
 def part1():
@@ -95,7 +95,7 @@ def part1():
     robot = Robot("input.txt")
     panel = Panel()
     main_loop(robot, panel)
-    print(len(panel.colours))
+    return len(panel.colours)
 
 
 def part2():
@@ -103,7 +103,7 @@ def part2():
     panel = Panel()
     panel.paint(WHITE, robot.position)
     main_loop(robot, panel)
-    panel.print()
+    return panel.render()
 
 
 BLACK = 0
@@ -117,5 +117,5 @@ RIGHT = 1
 DOWN = 2
 LEFT = 3
 
-part1()
-# part2()
+# print(part1())
+# print(part2())
