@@ -64,22 +64,6 @@ class Panel:
         return render_grid(grid)
 
 
-def part1():
-    robot = Robot("input.txt")
-    panel = Panel()
-
-    while robot.brain.is_running():
-        next_input = panel.get_colour(robot.position)
-        robot.brain.append_input(next_input)
-        next_colour = robot.brain.process()
-        next_rotation = robot.brain.process()
-        panel.paint(next_colour, robot.position)
-        robot.turn(next_rotation)
-        robot.move()
-
-    print(len(panel.colours))
-
-
 def main_loop(robot, panel):
     while robot.brain.is_running():
         next_input = panel.get_colour(robot.position)
