@@ -2,10 +2,10 @@ from math import gcd
 
 
 class Moon:
-    def __init__(self, x, y, z, vel_x, vel_y, vel_z):
-        self.x = PositionAndVelocity(x, vel_x)
-        self.y = PositionAndVelocity(y, vel_y)
-        self.z = PositionAndVelocity(z, vel_z)
+    def __init__(self, x, y, z):
+        self.x = PositionAndVelocity(x, 0)
+        self.y = PositionAndVelocity(y, 0)
+        self.z = PositionAndVelocity(z, 0)
 
     def move(self):
         self.x.position += self.x.velocity
@@ -57,7 +57,7 @@ def create_moons():
         y = int(line[line.index("=") + 1:line.index(",")])
         line = line[line.index(",") + 1:]
         z = int(line[line.index("=") + 1:])
-        return Moon(x, y, z, 0, 0, 0)
+        return Moon(x, y, z)
 
     lines = open("input.txt", "r").readlines()
     lines = list(map(lambda line: line.strip(), lines))
@@ -85,8 +85,6 @@ def adjust_velocity(moons):
 def get_energy(moons):
     energy = 0
     for moon in moons:
-        # print((abs(moon.x.position) + abs(moon.y.position) + abs(moon.z.position)) * (
-        #         abs(moon.x.velocity) + abs(moon.y.velocity) + abs(moon.z.velocity)))
         energy += (abs(moon.x.position) + abs(moon.y.position) + abs(moon.z.position)) * (
                 abs(moon.x.velocity) + abs(moon.y.velocity) + abs(moon.z.velocity))
     return energy
@@ -116,10 +114,19 @@ def part2():
     def update_period(period, axis_state, seen):
         if period is None and str(axis_state) in seen:
             period = time_steps
-            # print("period: " + str(period))
         else:
             seen.add(str(axis_state))
         return period
+
+    def create_axis_states():
+        _x_axis_state = AxisState()
+        _y_axis_state = AxisState()
+        _z_axis_state = AxisState()
+        for moon in moons:
+            _x_axis_state.add_position_and_velocity(PositionAndVelocity(moon.x.position, moon.x.velocity))
+            _y_axis_state.add_position_and_velocity(PositionAndVelocity(moon.y.position, moon.y.velocity))
+            _z_axis_state.add_position_and_velocity(PositionAndVelocity(moon.z.position, moon.z.velocity))
+        return _x_axis_state, _y_axis_state, _z_axis_state
 
     moons = create_moons()
     x_seen = set()
@@ -133,13 +140,7 @@ def part2():
     while x_period is None or y_period is None or z_period is None:
         adjust_velocity_and_move(moons)
 
-        x_axis_state = AxisState()
-        y_axis_state = AxisState()
-        z_axis_state = AxisState()
-        for moon in moons:
-            x_axis_state.add_position_and_velocity(PositionAndVelocity(moon.x.position, moon.x.velocity))
-            y_axis_state.add_position_and_velocity(PositionAndVelocity(moon.y.position, moon.y.velocity))
-            z_axis_state.add_position_and_velocity(PositionAndVelocity(moon.z.position, moon.z.velocity))
+        x_axis_state, y_axis_state, z_axis_state = create_axis_states()
 
         x_period = update_period(x_period, x_axis_state, x_seen)
         y_period = update_period(y_period, y_axis_state, y_seen)
