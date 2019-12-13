@@ -31,6 +31,9 @@ class IntcodeComputer:
     def append_input(self, new_input):
         self.inputs.append(new_input)
 
+    def write_mem_addr(self, addr, val):
+        self.ints[addr] = val
+
     def process(self):
         def grow_list(new_size):
             self.ints += [0] * (new_size - len(self.ints) + 1)
