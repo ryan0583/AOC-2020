@@ -168,7 +168,7 @@ maxDown = abs(min(wire1_y_range[0], wire2_y_range[0]))
 yDimension = maxUp + maxDown + 3
 
 debug_print(debug, "creating grid")
-grid = create_grid(xDimension, yDimension)
+grid = create_grid(xDimension, yDimension, "..")
 port_x = maxLeft + 1
 port_y = maxUp + 1
 grid[port_y][port_x] = "o"

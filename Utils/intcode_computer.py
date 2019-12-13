@@ -31,6 +31,12 @@ class IntcodeComputer:
     def append_input(self, new_input):
         self.inputs.append(new_input)
 
+    def replace_next_input(self, new_input):
+        if self.input_count >= len(self.inputs):
+            self.append_input(new_input)
+        else:
+            self.inputs[self.input_count] = new_input
+
     def write_mem_addr(self, addr, val):
         self.ints[addr] = val
 

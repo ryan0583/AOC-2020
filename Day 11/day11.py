@@ -54,7 +54,7 @@ class Panel:
         x_dim = max_x - min_x + 1
         y_dim = max_y - min_y + 1
 
-        grid = create_grid(x_dim, y_dim)
+        grid = create_grid(x_dim, y_dim, "..")
 
         for position, colour in self.colours.items():
             x_pos = position[0] - min_x

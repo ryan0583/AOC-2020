@@ -11,8 +11,8 @@ def print_grid(debug, grid):
     debug_print(debug, render_grid(grid))
 
 
-def create_grid(x_dimension, y_dimension):
-    return [x[:] for x in [[".."] * x_dimension] * y_dimension]
+def create_grid(x_dimension, y_dimension, char):
+    return [x[:] for x in [[char] * x_dimension] * y_dimension]
 
 
 def raise_(ex):
