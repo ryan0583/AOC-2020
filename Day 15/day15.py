@@ -1,4 +1,4 @@
-import time
+from random import randint
 
 from Utils.debug_tools import raise_
 from Utils.graphics_panel import GraphicsPanel
@@ -16,114 +16,6 @@ def get_next_point(direction, current_point):
     return direction_switcher.get(direction, lambda: raise_("Invalid direction: " + direction))()
 
 
-def choose_direction(direction, current_point, checked_points, blocked_points):
-    should_continue = get_next_point(direction, current_point) not in checked_points
-    if should_continue:
-        return can_continue(direction, current_point, blocked_points)
-    return None
-
-
-def can_continue(direction, current_point, blocked_points):
-    if get_next_point(direction, current_point) not in blocked_points:
-        return direction
-    return None
-
-
-def find_unblocked(current_point, blocked_points):
-    directions = [N, S, E, W]
-    for direction in directions:
-        if get_next_point(direction, current_point) not in blocked_points:
-            return direction
-
-
-def get_next_direction(direction, current_point, checked_points, blocked_points):
-    #should continue
-    new_direction = choose_direction(direction, current_point, checked_points, blocked_points)
-    if new_direction is not None:
-        return new_direction
-
-    if direction == N:
-        new_direction = choose_direction(W, current_point, checked_points, blocked_points)
-        if new_direction is not None:
-            return new_direction
-        new_direction = choose_direction(E, current_point, checked_points, blocked_points)
-        if new_direction is not None:
-            return new_direction
-
-    if direction == S:
-        new_direction = choose_direction(E, current_point, checked_points, blocked_points)
-        if new_direction is not None:
-            return new_direction
-        new_direction = choose_direction(W, current_point, checked_points, blocked_points)
-        if new_direction is not None:
-            return new_direction
-
-    if direction == W:
-        new_direction = choose_direction(N, current_point, checked_points, blocked_points)
-        if new_direction is not None:
-            return new_direction
-        new_direction = choose_direction(S, current_point, checked_points, blocked_points)
-        if new_direction is not None:
-            return new_direction
-
-    if direction == E:
-        new_direction = choose_direction(S, current_point, checked_points, blocked_points)
-        if new_direction is not None:
-            return new_direction
-        new_direction = choose_direction(N, current_point, checked_points, blocked_points)
-        if new_direction is not None:
-            return new_direction
-
-    #can continue
-    new_direction = can_continue(direction, current_point, blocked_points)
-    if new_direction is not None:
-        return new_direction
-
-    if direction == N:
-        new_direction = can_continue(W, current_point, blocked_points)
-        if new_direction is not None:
-            return new_direction
-        new_direction = can_continue(E, current_point, blocked_points)
-        if new_direction is not None:
-            return new_direction
-
-    if direction == S:
-        new_direction = can_continue(E, current_point, blocked_points)
-        if new_direction is not None:
-            return new_direction
-        new_direction = can_continue(W, current_point, blocked_points)
-        if new_direction is not None:
-            return new_direction
-
-    if direction == W:
-        new_direction = can_continue(N, current_point, blocked_points)
-        if new_direction is not None:
-            return new_direction
-        new_direction = can_continue(S, current_point, blocked_points)
-        if new_direction is not None:
-            return new_direction
-
-    if direction == E:
-        new_direction = can_continue(S, current_point, blocked_points)
-        if new_direction is not None:
-            return new_direction
-        new_direction = can_continue(N, current_point, blocked_points)
-        if new_direction is not None:
-            return new_direction
-
-    #go in opposite direction, or go in any unblocked direction
-    direction_switcher = {
-        N: lambda: S,
-        S: lambda: N,
-        W: lambda: E,
-        E: lambda: W
-    }
-    opposite_direction = direction_switcher.get(direction, lambda: raise_("Invalid direction: " + direction))()
-    if get_next_point(opposite_direction, current_point) in blocked_points:
-        return find_unblocked(current_point, blocked_points)
-    return opposite_direction
-
-
 def print_direction(direction):
     direction_switcher = {
         N: lambda: print("N"),
@@ -132,6 +24,35 @@ def print_direction(direction):
         E: lambda: print("E")
     }
     return direction_switcher.get(direction, lambda: raise_("Invalid direction: " + direction))()
+
+
+def turn_right(direction):
+    direction_switcher = {
+        N: lambda: E,
+        S: lambda: W,
+        W: lambda: N,
+        E: lambda: S
+    }
+    return direction_switcher.get(direction, lambda: raise_("Invalid direction: " + direction))()
+
+
+def turn_left(direction):
+    direction_switcher = {
+        N: lambda: W,
+        S: lambda: E,
+        W: lambda: S,
+        E: lambda: N
+    }
+    return direction_switcher.get(direction, lambda: raise_("Invalid direction: " + direction))()
+
+
+def turn(direction):
+    turn_dir = randint(0, 1)
+    if turn_dir == RIGHT:
+        return turn_right(direction)
+    elif turn_dir == LEFT:
+        return turn_left(direction)
+    return direction
 
 
 def update_panel(point, color, graphics_panel):
@@ -160,37 +81,46 @@ def part1():
     o2_system_point = None
 
     while o2_system_point is None:
-        print(current_point)
-        print_direction(direction)
+        # print(current_point)
+        # print_direction(direction)
         computer.replace_next_input(direction)
         output = computer.process()
         if output == BLOCKED:
-            print("blocked")
+            # print("blocked")
             next_point = get_next_point(direction, current_point)
             update_panel(next_point, BLOCKED_COLOR, graphics_panel)
             blocked_points.add(next_point)
         elif output == MOVED:
-            print("moved")
+            # print("moved")
             next_point = get_next_point(direction, current_point)
             update_panel(next_point, DROID_COLOR, graphics_panel)
-            update_panel(current_point, EMPTY_COLOR, graphics_panel)
+            color = EMPTY_COLOR
+            if current_point == Point(0, 0):
+                color = "white"
+            update_panel(current_point, color, graphics_panel)
             checked_points.add(current_point)
             current_point = next_point
         elif output == FOUND_O2_SYSTEM:
             o2_system_point = get_next_point(direction, current_point)
+            update_panel(o2_system_point, O2_SYSTEM_COLOR, graphics_panel)
         else:
             raise_("Unknown output: " + output)
         graphics_panel.paint_canvas()
+        direction = turn(direction)
         # time.sleep(0.1)
-        direction = get_next_direction(direction, current_point, checked_points, blocked_points)
 
     print(o2_system_point)
+    input("Press Enter to close...")
 
 
 N = 1
 S = 2
 W = 3
 E = 4
+
+RIGHT = 0
+LEFT = 1
+NONE = 3
 
 BLOCKED = 0
 MOVED = 1
@@ -199,5 +129,6 @@ FOUND_O2_SYSTEM = 2
 EMPTY_COLOR = "black"
 DROID_COLOR = "red"
 BLOCKED_COLOR = "blue"
+O2_SYSTEM_COLOR = "green"
 
 part1()
