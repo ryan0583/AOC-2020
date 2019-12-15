@@ -41,21 +41,21 @@ def adjust_for_surplus(chem_amount, surplus_chem):
 
 
 def get_adjusted_chem_amount(chem_amount, surplus_chem, multiple):
-    print(chem_amount.chem)
-    print(str(chem_amount.amount))
+    # print(chem_amount.chem)
+    # print(str(chem_amount.amount))
 
     surplus_chem_number = surplus_chem.get(chem_amount.chem)
-    print("SURPLUS: " + str(surplus_chem_number))
+    # print("SURPLUS: " + str(surplus_chem_number))
     if surplus_chem_number is not None:
         adjusted_chem_amount = multiple * chem_amount.amount - surplus_chem.get(chem_amount.chem, 0)
         if adjusted_chem_amount < 0:
             adjusted_chem_amount = 0
-        print("NEW CHEM AMOUNT: " + str(adjusted_chem_amount))
+        # print("NEW CHEM AMOUNT: " + str(adjusted_chem_amount))
         remaining = surplus_chem_number - (chem_amount.amount * multiple)
         surplus_chem[chem_amount.chem] = remaining if remaining >= 0 else 0
-        print("NEW SURPLUS: " + str(surplus_chem[chem_amount.chem]))
+        # print("NEW SURPLUS: " + str(surplus_chem[chem_amount.chem]))
         return adjusted_chem_amount
-    print("NEW CHEM AMOUNT: " + str(multiple * chem_amount.amount))
+    # print("NEW CHEM AMOUNT: " + str(multiple * chem_amount.amount))
     return multiple * chem_amount.amount
 
 
@@ -75,7 +75,7 @@ def expand_chem(chem_amount, chem_map, surplus_chem):
         surplus_chem[chem_amount.chem] = surplus
     else:
         surplus_chem[chem_amount.chem] = exiting_surplus + surplus
-    print("WILL HAVE SURPLUS OF: " + str(surplus_chem[chem_amount.chem]))
+    # print("WILL HAVE SURPLUS OF: " + str(surplus_chem[chem_amount.chem]))
 
     return list(
         map(lambda expanded_chem_amount: ChemAmount(
@@ -84,39 +84,66 @@ def expand_chem(chem_amount, chem_map, surplus_chem):
             chem_expansion[1]))
 
 
-def print_list(list):
+def print_list(list_to_print):
     output = ""
-    for chem_amount in list:
+    for chem_amount in list_to_print:
         output += str(chem_amount.amount) + chem_amount.chem + ", "
     print(output)
 
 
-def part1(filename):
+def create_chem_map(filename):
     lines = open(filename, "r").readlines()
     chem_map = {}
-    surplus_chem = {}
     for line in lines:
         key, vals = create_chem_amounts(line)
         chem_map[key] = key, vals
+    return chem_map
 
+
+def loop_body(chem_map, surplus_chem):
     fuel_chem_list = chem_map.get(FUEL)
-    print_list(fuel_chem_list[1])
+    # print_list(fuel_chem_list[1])
     while len(fuel_chem_list[1]) > 1:
         expanded_list = []
         for chem_amount in fuel_chem_list[1]:
             adjust_for_surplus(chem_amount, surplus_chem)
             if chem_amount.amount > 0:
                 expanded_list.extend(expand_chem(chem_amount, chem_map, surplus_chem))
-        print(surplus_chem)
-        print_list(expanded_list)
+        # print(surplus_chem)
+        # print_list(expanded_list)
         chem_map[FUEL] = fuel_chem_list[0], consolidate_list(expanded_list)
         fuel_chem_list = chem_map.get(FUEL)
-        print_list(fuel_chem_list[1])
+        # print_list(fuel_chem_list[1])
+    return fuel_chem_list
+
+
+def part1(filename):
+    surplus_chem = {}
+    chem_map = create_chem_map(filename)
+
+    fuel_chem_list = loop_body(chem_map, surplus_chem)
 
     return fuel_chem_list[1][0].amount
+
+
+def part2(filename):
+    total_ore = 1000000000000
+    surplus_chem = {}
+    fuel_count = 0
+
+    while total_ore > 0:
+        print("ORE REMAINING: " + str(total_ore))
+        chem_map = create_chem_map(filename)
+        fuel_chem_list = loop_body(chem_map, surplus_chem)
+        total_ore -= fuel_chem_list[1][0].amount
+        if total_ore >= 0:
+            fuel_count += 1
+
+    return str(fuel_count)
 
 
 FUEL = ChemAmount("0", "FUEL")
 ORE = ChemAmount("0", "ORE")
 
-print(part1("input.txt"))
+# print(part1("input.txt"))
+print(part2("input.txt"))

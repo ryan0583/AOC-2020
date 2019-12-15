@@ -1,6 +1,6 @@
 import unittest
 
-from day14 import part1
+from day14 import part1, part2
 
 
 class Test(unittest.TestCase):
@@ -25,3 +25,6 @@ class Test(unittest.TestCase):
 
     def test_part1_real(self):
         self.assertEqual("741927", str(part1("input.txt")))
+
+    def test_part2_example5(self):
+        self.assertEqual("460664", str(part2("testinput5.txt")))
