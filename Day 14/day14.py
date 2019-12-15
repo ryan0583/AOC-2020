@@ -51,7 +51,7 @@ def get_adjusted_chem_amount(chem_amount, surplus_chem, multiple):
         if adjusted_chem_amount < 0:
             adjusted_chem_amount = 0
         print("NEW CHEM AMOUNT: " + str(adjusted_chem_amount))
-        remaining = surplus_chem_number - chem_amount.amount
+        remaining = surplus_chem_number - (chem_amount.amount * multiple)
         surplus_chem[chem_amount.chem] = remaining if remaining >= 0 else 0
         print("NEW SURPLUS: " + str(surplus_chem[chem_amount.chem]))
         return adjusted_chem_amount
@@ -91,8 +91,8 @@ def print_list(list):
     print(output)
 
 
-def part1():
-    lines = open("testinput.txt", "r").readlines()
+def part1(filename):
+    lines = open(filename, "r").readlines()
     chem_map = {}
     surplus_chem = {}
     for line in lines:
@@ -113,10 +113,10 @@ def part1():
         fuel_chem_list = chem_map.get(FUEL)
         print_list(fuel_chem_list[1])
 
-    print(fuel_chem_list[1][0].amount)
+    return fuel_chem_list[1][0].amount
 
 
 FUEL = ChemAmount("0", "FUEL")
 ORE = ChemAmount("0", "ORE")
 
-part1()
+print(part1("input.txt"))
