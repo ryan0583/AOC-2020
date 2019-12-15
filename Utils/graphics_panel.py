@@ -46,4 +46,4 @@ class GraphicsPanel:
         self.canvas.itemconfigure(self.text_component, text=text)
 
 
-GAME_SCALE = 20
+GAME_SCALE = 10
