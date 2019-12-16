@@ -35,7 +35,32 @@ def part1():
         output = []
         print(input_list)
 
-    print(input_list)
+    print("".join(input_list[0:8]))
 
 
-part1()
+def part2():
+    input_list = list(open("input.txt", "r").read())
+    full_input_list = []
+    for i in range(0, 10000):
+        full_input_list.extend(input_list)
+
+    message_offset = int("".join(input_list[0:7]))
+    output = []
+
+    phase_count = 0
+    while phase_count < 100:
+        phase_count += 1
+        print(phase_count)
+        for i in range(0, len(full_input_list)):
+            pattern = get_repeating_pattern(len(full_input_list), i + 1)
+            output.append(process(full_input_list, pattern))
+            print(len(output))
+        full_input_list = output
+        output = []
+        print(input_list)
+
+    print(input_list[message_offset: message_offset + 8])
+
+
+# part1()
+part2()
