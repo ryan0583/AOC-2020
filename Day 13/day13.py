@@ -1,8 +1,10 @@
+import time
+
 from Utils.debug_tools import raise_
+from Utils.graphics_panel import *
 from Utils.intcode_computer import IntcodeComputer
 from Utils.point import Point
-from Utils.graphics_panel import *
-import time
+
 
 def part1():
     intcode_computer = IntcodeComputer([], "input.txt", True)
