@@ -1,3 +1,4 @@
+import time
 from random import randint
 
 from Utils.debug_tools import raise_
@@ -60,6 +61,32 @@ def update_panel(point, color, graphics_panel):
     graphics_panel.update_canvas(normalised_point, color)
 
 
+def do_stuff(computer, direction, current_point, graphics_panel, checked_points, blocked_points):
+    next_point = get_next_point(direction, current_point)
+    if next_point in checked_points:
+        return BLOCKED if next_point in blocked_points else None
+
+    checked_points.add(next_point)
+    computer.replace_next_input(direction)
+    output = computer.process()
+    if output == BLOCKED:
+        update_panel(next_point, BLOCKED_COLOR, graphics_panel)
+        blocked_points.add(next_point)
+    elif output == MOVED:
+        update_panel(next_point, DROID_COLOR, graphics_panel)
+        color = EMPTY_COLOR
+        if current_point == Point(0, 0):
+            color = "white"
+        update_panel(current_point, color, graphics_panel)
+    elif output == FOUND_O2_SYSTEM:
+        update_panel(next_point, O2_SYSTEM_COLOR, graphics_panel)
+    else:
+        raise_("Unknown output: " + output)
+    graphics_panel.paint_canvas()
+    time.sleep(0.02)
+    return output
+
+
 def part1():
     tile_map = {}
     for x in range(0, 100):
@@ -72,6 +99,7 @@ def part1():
 
     blocked_points = set()
     checked_points = set()
+    tried_directions = {}
     current_point = Point(0, 0)
     update_panel(current_point, DROID_COLOR, graphics_panel)
     graphics_panel.paint_canvas()
@@ -83,32 +111,65 @@ def part1():
     while o2_system_point is None:
         # print(current_point)
         # print_direction(direction)
-        computer.replace_next_input(direction)
-        output = computer.process()
-        if output == BLOCKED:
-            # print("blocked")
-            next_point = get_next_point(direction, current_point)
-            update_panel(next_point, BLOCKED_COLOR, graphics_panel)
-            blocked_points.add(next_point)
-        elif output == MOVED:
-            # print("moved")
-            next_point = get_next_point(direction, current_point)
-            update_panel(next_point, DROID_COLOR, graphics_panel)
-            color = EMPTY_COLOR
-            if current_point == Point(0, 0):
-                color = "white"
-            update_panel(current_point, color, graphics_panel)
-            checked_points.add(current_point)
-            current_point = next_point
+        direction = turn_right(direction)
+        output = do_stuff(computer, direction, current_point, graphics_panel, checked_points, blocked_points)
+        if output == MOVED:
+            current_point = get_next_point(direction, current_point)
+            continue
         elif output == FOUND_O2_SYSTEM:
             o2_system_point = get_next_point(direction, current_point)
-            update_panel(o2_system_point, O2_SYSTEM_COLOR, graphics_panel)
-        else:
-            raise_("Unknown output: " + output)
+            break
+
+        direction = turn_left(turn_left(direction))
+        output = do_stuff(computer, direction, current_point, graphics_panel, checked_points, blocked_points)
+        if output == MOVED:
+            current_point = get_next_point(direction, current_point)
+            continue
+        elif output == FOUND_O2_SYSTEM:
+            o2_system_point = get_next_point(direction, current_point)
+            break
+
+        direction = turn_right(direction)
+        output = do_stuff(computer, direction, current_point, graphics_panel, checked_points, blocked_points)
+        if output == MOVED:
+            current_point = get_next_point(direction, current_point)
+            continue
+        elif output == FOUND_O2_SYSTEM:
+            o2_system_point = get_next_point(direction, current_point)
+            break
+        elif output == BLOCKED:
+            while output == BLOCKED:
+                direction = turn(direction)
+                output = do_stuff(computer, direction, current_point, graphics_panel, set(), set())
+                if output == MOVED:
+                    current_point = get_next_point(direction, current_point)
+        elif output is None:
+            tried_directions_for_point = tried_directions.get(Point)
+            if tried_directions_for_point is None:
+                tried_directions[Point] = set()
+                tried_directions_for_point = tried_directions.get(Point)
+
+            count = 0
+            while direction in tried_directions_for_point and count < 4:
+                direction = turn_right(direction)
+                count += 1
+
+            if count < 4:
+                tried_directions_for_point.add(direction)
+            else:
+                direction = turn(direction)
+
+            output = do_stuff(computer, direction, current_point, graphics_panel, set(), set())
+            if output == MOVED:
+                current_point = get_next_point(direction, current_point)
+                continue
+
         graphics_panel.paint_canvas()
-        direction = turn(direction)
+        time.sleep(0.02)
+
         # time.sleep(0.1)
 
+    graphics_panel.paint_canvas()
     print(o2_system_point)
     input("Press Enter to close...")
 
