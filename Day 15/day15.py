@@ -1,10 +1,28 @@
-import time
 from random import randint
 
 from Utils.debug_tools import raise_
 from Utils.graphics_panel import GraphicsPanel
 from Utils.intcode_computer import IntcodeComputer
 from Utils.point import Point
+
+
+class Droid:
+    def __init__(self, brain, point, direction, path):
+        self.brain = brain
+        self.point = point
+        self.direction = direction
+        self.path = list(path)
+        self.last_output = None
+        self.is_blocked = False
+
+    def move(self):
+        self.brain.replace_next_input(self.direction)
+        self.last_output = self.brain.process()
+        if self.last_output == BLOCKED:
+            self.is_blocked = True
+        elif self.last_output == MOVED:
+            self.path.append(self.point)
+            self.point = get_next_point(self.direction, self.point)
 
 
 def get_next_point(direction, current_point):
@@ -61,33 +79,19 @@ def update_panel(point, color, graphics_panel):
     graphics_panel.update_canvas(normalised_point, color)
 
 
-def do_stuff(computer, direction, current_point, graphics_panel, checked_points, blocked_points):
-    next_point = get_next_point(direction, current_point)
-    if next_point in checked_points:
-        return BLOCKED if next_point in blocked_points else None
-
-    checked_points.add(next_point)
-    computer.replace_next_input(direction)
-    output = computer.process()
-    if output == BLOCKED:
-        update_panel(next_point, BLOCKED_COLOR, graphics_panel)
-        blocked_points.add(next_point)
-    elif output == MOVED:
-        update_panel(next_point, DROID_COLOR, graphics_panel)
-        color = EMPTY_COLOR
-        if current_point == Point(0, 0):
-            color = "white"
-        update_panel(current_point, color, graphics_panel)
-    elif output == FOUND_O2_SYSTEM:
-        update_panel(next_point, O2_SYSTEM_COLOR, graphics_panel)
-    else:
-        raise_("Unknown output: " + output)
-    graphics_panel.paint_canvas()
-    time.sleep(0.02)
-    return output
-
-
 def part1():
+    def add_right_droid():
+        next_right_position = get_next_point(turn_right(droid.direction), droid.point)
+        if next_right_position not in checked_points and next_right_position not in blocked_points:
+            droids.append(
+                Droid(IntcodeComputer.copy(droid.brain), droid.point, turn_right(droid.direction), droid.path))
+
+    def add_left_droid():
+        next_left_position = get_next_point(turn_left(droid.direction), droid.point)
+        if next_left_position not in checked_points and next_left_position not in blocked_points:
+            droids.append(
+                Droid(IntcodeComputer.copy(droid.brain), droid.point, turn_left(droid.direction), droid.path))
+
     tile_map = {}
     for x in range(0, 100):
         for y in range(0, 100):
@@ -97,80 +101,47 @@ def part1():
     graphics_panel.init_game()
     graphics_panel.paint_canvas()
 
-    blocked_points = set()
-    checked_points = set()
-    tried_directions = {}
     current_point = Point(0, 0)
+    checked_points = set()
+    blocked_points = set()
+
     update_panel(current_point, DROID_COLOR, graphics_panel)
     graphics_panel.paint_canvas()
-    # time.sleep(0.1)
-    computer = IntcodeComputer([], "input.txt", True)
-    direction = N
-    o2_system_point = None
 
-    while o2_system_point is None:
-        # print(current_point)
-        # print_direction(direction)
-        direction = turn_right(direction)
-        output = do_stuff(computer, direction, current_point, graphics_panel, checked_points, blocked_points)
-        if output == MOVED:
-            current_point = get_next_point(direction, current_point)
-            continue
-        elif output == FOUND_O2_SYSTEM:
-            o2_system_point = get_next_point(direction, current_point)
-            break
+    droids = [Droid(IntcodeComputer([], "input.txt", True), current_point, N, [current_point]),
+              Droid(IntcodeComputer([], "input.txt", True), current_point, S, [current_point]),
+              Droid(IntcodeComputer([], "input.txt", True), current_point, E, [current_point]),
+              Droid(IntcodeComputer([], "input.txt", True), current_point, W, [current_point])]
 
-        direction = turn_left(turn_left(direction))
-        output = do_stuff(computer, direction, current_point, graphics_panel, checked_points, blocked_points)
-        if output == MOVED:
-            current_point = get_next_point(direction, current_point)
-            continue
-        elif output == FOUND_O2_SYSTEM:
-            o2_system_point = get_next_point(direction, current_point)
-            break
+    path = None
 
-        direction = turn_right(direction)
-        output = do_stuff(computer, direction, current_point, graphics_panel, checked_points, blocked_points)
-        if output == MOVED:
-            current_point = get_next_point(direction, current_point)
-            continue
-        elif output == FOUND_O2_SYSTEM:
-            o2_system_point = get_next_point(direction, current_point)
-            break
-        elif output == BLOCKED:
-            while output == BLOCKED:
-                direction = turn(direction)
-                output = do_stuff(computer, direction, current_point, graphics_panel, set(), set())
-                if output == MOVED:
-                    current_point = get_next_point(direction, current_point)
-        elif output is None:
-            tried_directions_for_point = tried_directions.get(Point)
-            if tried_directions_for_point is None:
-                tried_directions[Point] = set()
-                tried_directions_for_point = tried_directions.get(Point)
+    while path is None:
+        for droid in droids:
+            checked_points.add(droid.point)
+            droid.move()
+            if droid.last_output == MOVED:
+                update_panel(droid.point, DROID_COLOR, graphics_panel)
+                graphics_panel.paint_canvas()
+                # time.sleep(.1)
+            elif droid.last_output == BLOCKED:
+                blocked_points.add(get_next_point(droid.direction, droid.point))
+                update_panel(get_next_point(droid.direction, droid.point), BLOCKED_COLOR, graphics_panel)
+                graphics_panel.paint_canvas()
+                # time.sleep(.1)
+                droids.remove(droid)
+            elif droid.last_output == FOUND_O2_SYSTEM:
+                update_panel(get_next_point(droid.direction, droid.point), O2_SYSTEM_COLOR, graphics_panel)
+                path = droid.path
 
-            count = 0
-            while direction in tried_directions_for_point and count < 4:
-                direction = turn_right(direction)
-                count += 1
+            add_right_droid()
 
-            if count < 4:
-                tried_directions_for_point.add(direction)
-            else:
-                direction = turn(direction)
-
-            output = do_stuff(computer, direction, current_point, graphics_panel, set(), set())
-            if output == MOVED:
-                current_point = get_next_point(direction, current_point)
-                continue
+            add_left_droid()
 
         graphics_panel.paint_canvas()
-        time.sleep(0.02)
-
-        # time.sleep(0.1)
+        # time.sleep(.1)
 
     graphics_panel.paint_canvas()
-    print(o2_system_point)
+    print(len(path))
     input("Press Enter to close...")
 
 

@@ -16,6 +16,7 @@ class IntcodeComputer:
             return self.opcode + ", " + self.param1_mode + ", " + self.param2_mode + ", " + self.param3_mode
 
     def __init__(self, inputs, file_name, return_on_output):
+        self.file_name = file_name
         self.ints = list(map(int, open(file_name, "r").read().split(",")))
         self.inputs = list(inputs)
         self.index = 0
@@ -24,6 +25,18 @@ class IntcodeComputer:
         self.last_output = 0
         self.input_count = 0
         self.rel_offset = 0
+
+    @staticmethod
+    def copy(other_computer):
+        new_computer = IntcodeComputer([], other_computer.file_name, other_computer.return_on_output)
+        new_computer.ints = list(other_computer.ints)
+        new_computer.inputs = list(other_computer.inputs)
+        new_computer.index = other_computer.index
+        new_computer.opcode = other_computer.opcode
+        new_computer.last_output = other_computer.last_output
+        new_computer.input_count = other_computer.input_count
+        new_computer.rel_offset = other_computer.rel_offset
+        return new_computer
 
     def is_running(self):
         return self.opcode != STOP
