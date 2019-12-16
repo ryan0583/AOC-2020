@@ -12,11 +12,26 @@ def get_repeating_pattern(length, element_count):
     return pattern[1:length + 1]
 
 
-def process(input_list, pattern):
+def process(input_list, pattern, input_item_number):
+    def process_chunk():
+        _output = 0
+        for i, input_item in enumerate(input_list_chunk):
+            pattern_item = pattern_chunk[i]
+            if pattern_item == 0:
+                continue
+            _output += int(input_item) * pattern_item
+        return _output
+
     output = 0
-    for i, input_item in enumerate(input_list):
-        pattern_item = pattern[i]
-        output += int(input_item) * pattern_item
+    start_pos = input_item_number
+    end_pos = start_pos + input_item_number + 1
+    while start_pos < len(input_list):
+        input_list_chunk = input_list[start_pos:end_pos if end_pos < len(input_list) else len(input_list)]
+        pattern_chunk = pattern[start_pos:end_pos if end_pos < len(pattern) else len(pattern)]
+        output += process_chunk()
+        start_pos = end_pos + input_item_number + 1
+        end_pos = start_pos + input_item_number + 1
+
     output_str = str(output)
     return output_str[len(output_str) - 1: len(output_str)]
 
@@ -30,7 +45,7 @@ def part1():
         phase_count += 1
         for i in range(0, len(input_list)):
             pattern = get_repeating_pattern(len(input_list), i + 1)
-            output.append(process(input_list, pattern))
+            output.append(process(input_list, pattern, i))
         input_list = output
         output = []
         print(input_list)
@@ -39,28 +54,31 @@ def part1():
 
 
 def part2():
-    input_list = list(open("input.txt", "r").read())
+    input_list = [int(x) for x in list(open("input.txt", "r").read())]
     full_input_list = []
     for i in range(0, 10000):
         full_input_list.extend(input_list)
 
-    message_offset = int("".join(input_list[0:7]))
+    message_offset = int("".join(str(x) for x in input_list[0:7]))
+    full_input_list = full_input_list[message_offset:len(full_input_list)]
     output = []
 
     phase_count = 0
     while phase_count < 100:
         phase_count += 1
+        list_sum = sum(full_input_list)
         print(phase_count)
-        for i in range(0, len(full_input_list)):
-            pattern = get_repeating_pattern(len(full_input_list), i + 1)
-            output.append(process(full_input_list, pattern))
-            print(len(output))
+        count_to_subtract = 0
+        for item in full_input_list:
+            output_str = str(list_sum - count_to_subtract)
+            output.append(int(output_str[len(output_str) - 1: len(output_str)]))
+            count_to_subtract += item
         full_input_list = output
         output = []
-        print(input_list)
+        print(full_input_list)
 
-    print(input_list[message_offset: message_offset + 8])
+    print("".join(str(x) for x in full_input_list[0:8]))
 
 
-# part1()
-part2()
+part1()
+# part2()
