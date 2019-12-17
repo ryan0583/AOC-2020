@@ -63,11 +63,6 @@ def turn_left(direction):
     return direction_switcher.get(direction, lambda: raise_("Invalid direction: " + direction))()
 
 
-def update_panel(point, color, graphics_panel):
-    normalised_point = Point(22 + point.x, 22 + point.y)
-    graphics_panel.update_canvas(normalised_point, color)
-
-
 def part1():
     def add_right_droid(_droids, _droid):
         next_right_position = get_next_point(turn_right(_droid.direction), _droid.point)
@@ -91,13 +86,13 @@ def part1():
             checked_points.add(_droid.point)
             _droid.move()
             if _droid.last_output == MOVED:
-                update_panel(_droid.point, move_color, graphics_panel)
+                graphics_panel.update_canvas_with_offset(_droid.point, move_color, 22, 22)
             elif _droid.last_output == BLOCKED:
                 blocked_points.add(get_next_point(_droid.direction, _droid.point))
-                update_panel(get_next_point(_droid.direction, _droid.point), BLOCKED_COLOR, graphics_panel)
+                graphics_panel.update_canvas_with_offset(get_next_point(_droid.direction, _droid.point), BLOCKED_COLOR, 22, 22)
             elif _droid.last_output == FOUND_O2_SYSTEM:
                 _o2_tank_point = get_next_point(_droid.direction, _droid.point)
-                update_panel(_o2_tank_point, O2_COLOR, graphics_panel)
+                graphics_panel.update_canvas_with_offset(_o2_tank_point, O2_COLOR, 22, 22)
                 _path = _droid.path
                 _final_droid = _droid
 
@@ -112,20 +107,15 @@ def part1():
         graphics_panel.paint_canvas()
         return _droids, _o2_tank_point, _path, _final_droid
 
-    tile_map = {}
-    for x in range(0, 43):
-        for y in range(0, 43):
-            tile_map[Point(x, y)] = "black"
-
-    graphics_panel = GraphicsPanel(tile_map)
-    graphics_panel.init_game()
+    graphics_panel = GraphicsPanel.create_empty_panel(43, 43)
+    graphics_panel.init_canvas()
     graphics_panel.paint_canvas()
 
     current_point = Point(0, 0)
     checked_points = set()
     blocked_points = set()
 
-    update_panel(current_point, DROID_COLOR, graphics_panel)
+    graphics_panel.update_canvas_with_offset(current_point, DROID_COLOR, 22, 22)
     graphics_panel.paint_canvas()
 
     droids = [Droid(IntcodeComputer([], "input.txt", True), current_point, N, [current_point]),

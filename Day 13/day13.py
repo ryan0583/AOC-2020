@@ -66,7 +66,7 @@ def part2():
         if x == SCORE_X and y == SCORE_Y:
             if not setup_complete:
                 graphics_panel = GraphicsPanel({k: map_tile(v) for k, v in tiles.items()})
-                graphics_panel.init_game()
+                graphics_panel.init_canvas()
                 graphics_panel.add_text("SCORE: " + str(score), "white")
                 graphics_panel.paint_canvas()
                 setup_complete = True

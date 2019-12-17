@@ -4,13 +4,8 @@ from Utils.point import Point
 
 
 def part1():
-    tile_map = {}
-    for x in range(0, 100):
-        for y in range(0, 100):
-            tile_map[Point(x, y)] = "black"
-
-    graphics_panel = GraphicsPanel(tile_map)
-    graphics_panel.init_game()
+    graphics_panel = GraphicsPanel.create_empty_panel(100, 100)
+    graphics_panel.init_canvas()
     graphics_panel.paint_canvas()
 
     camera = IntcodeComputer([], "input.txt", True)
