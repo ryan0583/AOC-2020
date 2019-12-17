@@ -22,6 +22,7 @@ def part1():
             color = SCAFFOLD_COLOR
             scaffold_count += 1
         elif output == ROBOT_UP or output == ROBOT_RIGHT or output == ROBOT_LEFT or output == ROBOT_DOWN or output == ROBOT_DEAD:
+            print(output)
             color = ROBOT_COLOR
         elif output == SPACE:
             color = SPACE_COLOR
@@ -56,6 +57,35 @@ def part1():
     input("Press any key...")
 
 
+def part2():
+    main_routine = convert_to_ascii("A,B,A,C,B,C,A,B,A,C\n")
+    func_a = convert_to_ascii("R,10,L,8,R,10,R,4\n")
+    func_b = convert_to_ascii("L,6,L,6,R,10\n")
+    func_c = convert_to_ascii("L,6,R,12,R,12,R,10\n")
+
+    all_inputs = []
+    all_inputs.extend(main_routine)
+    all_inputs.extend(func_a)
+    all_inputs.extend(func_b)
+    all_inputs.extend(func_c)
+    all_inputs.extend(convert_to_ascii("n\n"))
+
+    computer = IntcodeComputer(all_inputs, "input.txt", True)
+    computer.write_mem_addr(0, 2)
+    output = computer.process()
+    while output < 130:
+        output = computer.process()
+        if output == ROBOT_DEAD:
+            print("DEAD!")
+            break
+
+    print(output)
+
+
+def convert_to_ascii(string):
+    return [ord(c) for c in string]
+
+
 SCAFFOLD = 35
 SPACE = 46
 NEW_LINE = 10
@@ -69,4 +99,5 @@ SCAFFOLD_COLOR = "yellow"
 SPACE_COLOR = "black"
 ROBOT_COLOR = "red"
 
-part1()
+# part1()
+part2()
