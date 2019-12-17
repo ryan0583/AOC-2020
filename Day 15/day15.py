@@ -139,7 +139,6 @@ def part1():
 
     while path is None:
         droids, o2_tank_point, path, final_droid = move_droids(droids, DROID_COLOR)
-        graphics_panel.paint_canvas()
         # time.sleep(.1)
 
     graphics_panel.paint_canvas()
