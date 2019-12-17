@@ -1,5 +1,3 @@
-from random import randint
-
 from Utils.debug_tools import raise_
 from Utils.graphics_panel import GraphicsPanel
 from Utils.intcode_computer import IntcodeComputer
@@ -63,15 +61,6 @@ def turn_left(direction):
         E: lambda: N
     }
     return direction_switcher.get(direction, lambda: raise_("Invalid direction: " + direction))()
-
-
-def turn(direction):
-    turn_dir = randint(0, 1)
-    if turn_dir == RIGHT:
-        return turn_right(direction)
-    elif turn_dir == LEFT:
-        return turn_left(direction)
-    return direction
 
 
 def update_panel(point, color, graphics_panel):
