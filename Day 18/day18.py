@@ -9,8 +9,10 @@ class Droid:
         self.point = point
         self.direction = direction
         self.keys = keys.copy()
+        self.mykeys = set()
         self.doors = doors.copy()
         self.mypath = []
+        self.color = droid_color
 
     def clone(self, direction):
         return Droid(self.path, self.point, direction, self.keys, self.doors)
@@ -30,34 +32,52 @@ class Droid:
         found_door_with_key = next_char.isupper() and next_char.lower() in self.keys
         can_move = can_move_to_space(next_char)
 
+        global droid_color
+
         if can_move:
             self.point = next_point
             self.path.append(self.point)
             self.mypath.append(self.point)
             can_turn_left = can_move_to_space(maze_map[get_next_point(turn_left(self.direction), self.point)])
             can_turn_right = can_move_to_space(maze_map[get_next_point(turn_right(self.direction), self.point)])
+
+
             if can_turn_left:
                 droids_to_add.append(self.clone(turn_left(self.direction)))
+
+
             if can_turn_right:
                 droids_to_add.append(self.clone(turn_right(self.direction)))
 
             if found_door_with_key and next_char not in self.doors:
                 self.doors.add(next_char)
-                droids_to_add.append(self.clone_reverse())
-            elif next_char.islower() and next_char not in self.keys:
-                self.keys.add(next_char)
-                droids_to_add.append(self.clone_reverse())
-        else:
-            droid_to_remove = self
-            can_turn_left = can_move_to_space(maze_map[get_next_point(turn_left(self.direction), self.point)])
-            can_turn_right = can_move_to_space(maze_map[get_next_point(turn_right(self.direction), self.point)])
-            if not can_turn_left and not can_turn_right and len(self.mypath) > 0:
-                droids_to_add.append(self.clone_reverse())
-                global droid_color
-                if droid_color == "green":
+                if self.color == "green":
                     droid_color = "blue"
                 else:
                     droid_color = "green"
+                if len(self.mykeys) > 0:
+                    droids_to_add.append(self.clone_reverse())
+            elif next_char.islower() and next_char not in self.keys:
+                self.keys.add(next_char)
+                self.mykeys.add(next_char)
+                if self.color == "green":
+                    droid_color = "blue"
+                else:
+                    droid_color = "green"
+                if len(self.mykeys) > 0:
+                    droids_to_add.append(self.clone_reverse())
+        else:
+            droid_to_remove = self
+            if not next_char.isupper():
+                can_turn_left = can_move_to_space(maze_map[get_next_point(turn_left(self.direction), self.point)])
+                can_turn_right = can_move_to_space(maze_map[get_next_point(turn_right(self.direction), self.point)])
+                if not can_turn_left and not can_turn_right and len(self.mypath) > 0 and len(self.mykeys) > 0:
+                    if self.color == "green":
+                        droid_color = "blue"
+                    else:
+                        droid_color = "green"
+
+                    droids_to_add.append(self.clone_reverse())
 
         return droids_to_add, droid_to_remove
 
@@ -191,16 +211,17 @@ def part1():
         droids_to_add = []
         droids_to_remove = set()
         for droid in droids:
-            panel.update_canvas(droid.point, droid_color)
-            panel.paint_canvas()
             add, remove = droid.attempt_move(maze_map)
+            panel.update_canvas(droid.point, droid.color)
+            panel.paint_canvas()
             droids_to_add.extend(add)
             if remove is not None:
                 droids_to_remove.add(remove)
         droids.extend(droids_to_add)
         droids = list(filter(lambda this_droid: this_droid not in droids_to_remove, droids))
         droids = list(filter(
-            lambda this_droid: droid_map.get(DroidMapKey(this_droid, get_next_point(this_droid.direction, this_droid.point))) is None,
+            lambda this_droid: droid_map.get(
+                DroidMapKey(this_droid, get_next_point(this_droid.direction, this_droid.point))) is None,
             droids))
         droid_map.update(hash_droids(droids))
 
