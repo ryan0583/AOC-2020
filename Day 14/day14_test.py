@@ -9,7 +9,7 @@ class Test(unittest.TestCase):
         self.assertEqual("31", str(part1("testinput.txt")))
 
     def test_part1_example2(self):
-        self.assertEqual("165", str(part1("testinput2.txt")))
+        self.assertEqual("165", str(part1("testinput2.txt.txt")))
 
     def test_part1_example3(self):
         self.assertEqual("13312", str(part1("testinput3.txt")))

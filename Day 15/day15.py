@@ -155,10 +155,6 @@ S = 2
 W = 3
 E = 4
 
-RIGHT = 0
-LEFT = 1
-NONE = 3
-
 BLOCKED = 0
 MOVED = 1
 FOUND_O2_SYSTEM = 2
