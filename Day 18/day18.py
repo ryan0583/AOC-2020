@@ -22,7 +22,8 @@ class Droid:
 
     def attempt_move(self, maze_map):
         def can_move_to_space(_next_char):
-            return _next_char == SPACE or _next_char.islower() or found_door_with_key
+            return _next_char == SPACE or _next_char.islower() or (
+                    _next_char.isupper() and _next_char.lower() in self.keys)
 
         droids_to_add = []
         droid_to_remove = None
@@ -41,43 +42,20 @@ class Droid:
             can_turn_left = can_move_to_space(maze_map[get_next_point(turn_left(self.direction), self.point)])
             can_turn_right = can_move_to_space(maze_map[get_next_point(turn_right(self.direction), self.point)])
 
-
             if can_turn_left:
                 droids_to_add.append(self.clone(turn_left(self.direction)))
-
 
             if can_turn_right:
                 droids_to_add.append(self.clone(turn_right(self.direction)))
 
             if found_door_with_key and next_char not in self.doors:
                 self.doors.add(next_char)
-                if self.color == "green":
-                    droid_color = "blue"
-                else:
-                    droid_color = "green"
-                if len(self.mykeys) > 0:
-                    droids_to_add.append(self.clone_reverse())
             elif next_char.islower() and next_char not in self.keys:
                 self.keys.add(next_char)
                 self.mykeys.add(next_char)
-                if self.color == "green":
-                    droid_color = "blue"
-                else:
-                    droid_color = "green"
-                if len(self.mykeys) > 0:
-                    droids_to_add.append(self.clone_reverse())
+                droids_to_add.append(self.clone_reverse())
         else:
             droid_to_remove = self
-            if not next_char.isupper():
-                can_turn_left = can_move_to_space(maze_map[get_next_point(turn_left(self.direction), self.point)])
-                can_turn_right = can_move_to_space(maze_map[get_next_point(turn_right(self.direction), self.point)])
-                if not can_turn_left and not can_turn_right and len(self.mypath) > 0 and len(self.mykeys) > 0:
-                    if self.color == "green":
-                        droid_color = "blue"
-                    else:
-                        droid_color = "green"
-
-                    droids_to_add.append(self.clone_reverse())
 
         return droids_to_add, droid_to_remove
 
@@ -99,17 +77,15 @@ class Droid:
 
 class DroidMapKey:
     def __init__(self, droid, point):
-        self.direction = droid.direction
         self.keys = droid.keys
         self.point = point
 
     def __eq__(self, other):
         return self.point == other.point \
-               and self.direction == other.direction \
-               and self.keys == other.keys
+               and len(self.keys) <= len(other.keys)
 
     def __str__(self):
-        return str(self.point) + str(self.direction) + str(self.keys)
+        return str(self.point) + str(self.keys)
 
     def __hash__(self):
         return hash(str(self))
@@ -158,12 +134,16 @@ def map_color(char):
         return "red"
 
 
-def all_keys_found(droids, key_count):
-    droids_found_all_keys = []
+def max_key_droid(droids):
+    max_count = 0
+    max_droid = None
     for droid in droids:
-        if len(droid.keys) >= key_count:
-            droids_found_all_keys.append(droid)
-    return droids_found_all_keys
+        if len(droid.keys) >= max_count:
+            max_droid = droid
+            max_count = len(max_droid.keys)
+
+    print("KeyCount: " + str(max_count))
+    return max_droid
 
 
 def hash_droids(droids):
@@ -197,6 +177,8 @@ def part1():
             panel.update_canvas(point, map_color(char))
             maze_map[Point(x, y)] = char
 
+    print(key_count)
+
     panel.paint_canvas()
 
     droids = [Droid([], start_point, N, set(), set()),
@@ -206,11 +188,14 @@ def part1():
 
     droid_map = hash_droids(droids)
 
-    while len(all_keys_found(droids, key_count)) == 0:
-        print(len(droids))
+    max_droid = max_key_droid(droids)
+
+    while len(max_droid.keys) < key_count:
+        # print(len(droids))
         droids_to_add = []
         droids_to_remove = set()
         for droid in droids:
+            panel.update_canvas(droid.point, "black")
             add, remove = droid.attempt_move(maze_map)
             panel.update_canvas(droid.point, droid.color)
             panel.paint_canvas()
@@ -223,13 +208,18 @@ def part1():
             lambda this_droid: droid_map.get(
                 DroidMapKey(this_droid, get_next_point(this_droid.direction, this_droid.point))) is None,
             droids))
+        max_droid = max_key_droid(droids)
+        droids = list(filter(
+            lambda this_droid: len(this_droid.path) <= len(max_droid.path),
+            droids))
+        print(len(droids))
         droid_map.update(hash_droids(droids))
 
     panel.paint_canvas()
-    droids_found_keys = all_keys_found(droids, key_count)
-    min_path = min(list(map(lambda this_droid: len(this_droid.path), droids_found_keys)))
-    print(min_path)
-    # input("press any key")
+    max_droid = max_key_droid(droids)
+    print(len(max_droid.keys))
+    print(len(max_droid.path))
+    input("press any key")
 
 
 N = "N"
@@ -241,6 +231,6 @@ WALL = "#"
 SPACE = "."
 ENTRY = "@"
 
-droid_color = "green"
+droid_color = "blue"
 
 part1()
