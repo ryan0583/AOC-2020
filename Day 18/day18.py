@@ -1,5 +1,3 @@
-import time
-
 from Utils.debug_tools import raise_
 from Utils.graphics_panel import GraphicsPanel
 from Utils.point import Point
@@ -72,7 +70,26 @@ class Droid:
                and self.mypath == other.mypath
 
     def __str__(self):
-        return str(self.path) + str(self.point) + str(self.direction) + str(self.keys) + str(self.doors) + str(self.mypath)
+        return str(self.path) + str(self.point) + str(self.direction) + str(self.keys) + str(self.doors) + str(
+            self.mypath)
+
+    def __hash__(self):
+        return hash(str(self))
+
+
+class DroidMapKey:
+    def __init__(self, droid, point):
+        self.direction = droid.direction
+        self.keys = droid.keys
+        self.point = point
+
+    def __eq__(self, other):
+        return self.point == other.point \
+               and self.direction == other.direction \
+               and self.keys == other.keys
+
+    def __str__(self):
+        return str(self.point) + str(self.direction) + str(self.keys)
 
     def __hash__(self):
         return hash(str(self))
@@ -129,6 +146,15 @@ def all_keys_found(droids, key_count):
     return droids_found_all_keys
 
 
+def hash_droids(droids):
+    droid_map = {}
+    for droid in droids:
+        key = DroidMapKey(droid, droid.point)
+        droid_map[key] = droid
+
+    return droid_map
+
+
 def part1():
     lines = open("testinput.txt", "r").read().splitlines()
 
@@ -158,8 +184,10 @@ def part1():
               Droid([], start_point, E, set(), set()),
               Droid([], start_point, W, set(), set())]
 
+    droid_map = hash_droids(droids)
+
     while len(all_keys_found(droids, key_count)) == 0:
-        # print(len(droids))
+        print(len(droids))
         droids_to_add = []
         droids_to_remove = set()
         for droid in droids:
@@ -171,10 +199,14 @@ def part1():
                 droids_to_remove.add(remove)
         droids.extend(droids_to_add)
         droids = list(filter(lambda this_droid: this_droid not in droids_to_remove, droids))
+        droids = list(filter(
+            lambda this_droid: droid_map.get(DroidMapKey(this_droid, get_next_point(this_droid.direction, this_droid.point))) is None,
+            droids))
+        droid_map.update(hash_droids(droids))
 
     panel.paint_canvas()
     droids_found_keys = all_keys_found(droids, key_count)
-    min_path = min(list(map(lambda this_droid: len(this_droid.path), all_keys_found(droids, key_count))))
+    min_path = min(list(map(lambda this_droid: len(this_droid.path), droids_found_keys)))
     print(min_path)
     # input("press any key")
 
