@@ -11,14 +11,11 @@ class Droid:
         self.direction = direction
         self.path = list(path)
         self.last_output = None
-        self.is_blocked = False
 
     def move(self):
         self.brain.replace_next_input(self.direction)
         self.last_output = self.brain.process()
-        if self.last_output == BLOCKED:
-            self.is_blocked = True
-        elif self.last_output == MOVED:
+        if self.last_output == MOVED:
             self.path.append(self.point)
             self.point = get_next_point(self.direction, self.point)
 
@@ -63,18 +60,18 @@ def turn_left(direction):
     return direction_switcher.get(direction, lambda: raise_("Invalid direction: " + direction))()
 
 
-def part1():
-    def add_right_droid(_droids, _droid):
-        next_right_position = get_next_point(turn_right(_droid.direction), _droid.point)
+def run():
+    def add_right_droid(_droids, droid):
+        next_right_position = get_next_point(turn_right(droid.direction), droid.point)
         if next_right_position not in checked_points and next_right_position not in blocked_points:
             _droids.append(
-                Droid(IntcodeComputer.copy(_droid.brain), _droid.point, turn_right(_droid.direction), _droid.path))
+                Droid(IntcodeComputer.copy(droid.brain), droid.point, turn_right(droid.direction), droid.path))
 
-    def add_left_droid(_droids, _droid):
-        next_left_position = get_next_point(turn_left(_droid.direction), _droid.point)
+    def add_left_droid(_droids, droid):
+        next_left_position = get_next_point(turn_left(droid.direction), droid.point)
         if next_left_position not in checked_points and next_left_position not in blocked_points:
             _droids.append(
-                Droid(IntcodeComputer.copy(_droid.brain), _droid.point, turn_left(_droid.direction), _droid.path))
+                Droid(IntcodeComputer.copy(droid.brain), droid.point, turn_left(droid.direction), droid.path))
 
     def move_droids(_droids, move_color):
         _o2_tank_point = None
@@ -82,23 +79,23 @@ def part1():
         _final_droid = None
         _droids_to_add = []
 
-        for _droid in _droids:
-            checked_points.add(_droid.point)
-            _droid.move()
-            if _droid.last_output == MOVED:
-                graphics_panel.update_canvas_with_offset(_droid.point, move_color, 22, 22)
-            elif _droid.last_output == BLOCKED:
-                blocked_points.add(get_next_point(_droid.direction, _droid.point))
-                graphics_panel.update_canvas_with_offset(get_next_point(_droid.direction, _droid.point), BLOCKED_COLOR, 22, 22)
-            elif _droid.last_output == FOUND_O2_SYSTEM:
-                _o2_tank_point = get_next_point(_droid.direction, _droid.point)
+        for droid in _droids:
+            checked_points.add(droid.point)
+            droid.move()
+            if droid.last_output == MOVED:
+                graphics_panel.update_canvas_with_offset(droid.point, move_color, 22, 22)
+            elif droid.last_output == BLOCKED:
+                blocked_points.add(get_next_point(droid.direction, droid.point))
+                graphics_panel.update_canvas_with_offset(get_next_point(droid.direction, droid.point), BLOCKED_COLOR, 22, 22)
+            elif droid.last_output == FOUND_O2_SYSTEM:
+                _o2_tank_point = get_next_point(droid.direction, droid.point)
                 graphics_panel.update_canvas_with_offset(_o2_tank_point, O2_COLOR, 22, 22)
-                _path = _droid.path
-                _final_droid = _droid
+                _path = droid.path
+                _final_droid = droid
 
-            add_right_droid(_droids_to_add, _droid)
+            add_right_droid(_droids_to_add, droid)
 
-            add_left_droid(_droids_to_add, _droid)
+            add_left_droid(_droids_to_add, droid)
 
         _droids.extend(_droids_to_add)
         _droids = list(filter(lambda _droid: _droid.point not in checked_points and _droid.point not in blocked_points,
@@ -118,10 +115,12 @@ def part1():
     graphics_panel.update_canvas_with_offset(current_point, DROID_COLOR, 22, 22)
     graphics_panel.paint_canvas()
 
-    droids = [Droid(IntcodeComputer([], "input.txt", True), current_point, N, [current_point]),
-              Droid(IntcodeComputer([], "input.txt", True), current_point, S, [current_point]),
-              Droid(IntcodeComputer([], "input.txt", True), current_point, E, [current_point]),
-              Droid(IntcodeComputer([], "input.txt", True), current_point, W, [current_point])]
+    filename = "input.txt"
+
+    droids = [Droid(IntcodeComputer([], filename, True), current_point, N, [current_point]),
+              Droid(IntcodeComputer([], filename, True), current_point, S, [current_point]),
+              Droid(IntcodeComputer([], filename, True), current_point, E, [current_point]),
+              Droid(IntcodeComputer([], filename, True), current_point, W, [current_point])]
 
     path = None
     o2_tank_point = None
@@ -169,4 +168,4 @@ DROID_COLOR = "red"
 BLOCKED_COLOR = "yellow"
 O2_COLOR = "blue"
 
-part1()
+run()
