@@ -1,5 +1,3 @@
-import math
-
 from Utils.graphics_panel import GraphicsPanel
 from Utils.intcode_computer import IntcodeComputer
 from Utils.point import Point
@@ -34,7 +32,7 @@ def part1():
     input("press any key")
 
 
-def part2():
+def print_stuff(start_x, start_y):
     dim = 100
 
     panel = GraphicsPanel.create_empty_panel(dim, dim)
@@ -45,61 +43,14 @@ def part2():
     filename = "input.txt"
     ints = list(map(int, open(filename, "r").read().split(",")))
 
-    points = []
-
-    # for x in range(0, dim):
-    #     for y in range(0, dim):
-    #         computer.reset(ints)
-    #         computer.inputs = [x, y]
-    #         output = computer.process()
-    #         if output == 1:
-    #             point = Point(x, y)
-    #             points.append(point)
-    #             panel.update_canvas(Point(x, y), "red")
-    #             panel.paint_canvas()
-    #
-    # last_col_points = list(filter(lambda _point: _point.x == dim - 1, points))
-    # drop = min(list(map(lambda _point: _point.y, last_col_points)))
-    #
-    # print(drop)
-    # beam_bottom = max(list(map(lambda _point: _point.y, last_col_points))) + 1
-    #
-    # print(beam_bottom - drop)
-    #
-    # angle1 = math.atan(drop / dim)
-    # print(math.degrees(angle1))
-    # angle2 = math.atan(beam_bottom / dim)
-    # print(math.degrees(angle2))
-    #
-    # print(dim * math.tan(angle1))
-    # print(dim * math.tan(angle2))
-    #
-    # desired_y_height = 100 + drop
-    #
-    # x = desired_y_height / (math.tan(angle2) - math.tan(angle1))
-    # y = x * math.tan(angle1) + drop
-    #
-    # print(str(x) + ", " + str(y))
-    #
-    # start_x = math.floor()
-    # start_y = math.floor(y) - 3
-
-    start_x = 1355
-    start_y = 765
-
-    print(str(start_x) + ", " + str(start_y))
-
     panel.reset()
-    for x in range(start_x, start_x + 1):
+    for x in range(start_x, start_x + dim):
         print("col " + str(x - start_x))
         for y in range(start_y, start_y + dim):
             computer.reset(ints)
             computer.inputs = [x, y]
             output = computer.process()
             if output == 1:
-                point = Point(x, y)
-                # print(point)
-                points.append(point)
                 panel.update_canvas_with_offset(Point(x, y), "red", -start_x, -start_y)
                 panel.paint_canvas()
             else:
@@ -107,4 +58,54 @@ def part2():
 
     input("press any key")
 
-part2()
+
+def part2():
+    def count_beam_squares(_x, _y_start, _y_end):
+        _count = 0
+        y = _y_start
+        _first_y = None
+        _last_y = None
+        found_beam = False
+        while True:
+            computer.reset(ints)
+            computer.inputs = [_x, y]
+            output = computer.process()
+            if output == 1:
+                _count += 1
+                found_beam = True
+                _first_y = y
+            elif found_beam:
+                _last_y = y - 1
+                break
+            y += 1
+            if _y_end is not None and y > _y_end:
+                break
+
+        return _count, _first_y, _last_y
+
+    computer = IntcodeComputer([], None, False)
+
+    filename = "input.txt"
+    ints = list(map(int, open(filename, "r").read().split(",")))
+
+    x = 1330
+    y_start = 400
+
+    while True:
+        count1, first_y1, last_y1 = count_beam_squares(x, y_start, None)
+        count2, first_y2, last_y2 = count_beam_squares(x + 99, last_y1 - 99, last_y1)
+        print("col = " + str(x))
+        print(count1)
+        print(last_y1 - 99)
+        print(count2)
+        print(first_y2)
+        if count2 == 100:
+            print("FOUND!!!")
+            break
+        x += 1
+
+
+# part1()
+# part2()
+print_stuff(1353, 764)
+
