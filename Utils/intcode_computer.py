@@ -17,10 +17,20 @@ class IntcodeComputer:
 
     def __init__(self, inputs, file_name, return_on_output):
         self.file_name = file_name
-        self.ints = list(map(int, open(file_name, "r").read().split(",")))
+        if file_name is not None:
+            self.ints = list(map(int, open(file_name, "r").read().split(",")))
         self.inputs = list(inputs)
         self.index = 0
         self.return_on_output = return_on_output
+        self.opcode = None
+        self.last_output = 0
+        self.input_count = 0
+        self.rel_offset = 0
+
+    def reset(self, ints):
+        self.ints = list(ints)
+        self.inputs = []
+        self.index = 0
         self.opcode = None
         self.last_output = 0
         self.input_count = 0

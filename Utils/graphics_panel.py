@@ -18,6 +18,10 @@ class GraphicsPanel:
                 tile_map[Point(x, y)] = "black"
         return GraphicsPanel(tile_map)
 
+    def reset(self):
+        for point in self.tiles.keys():
+            self.update_canvas(point, "black")
+
     def update_canvas_with_offset(self, point, color, x_offset, y_offset):
         normalised_point = Point(x_offset + point.x, y_offset + point.y)
         self.update_canvas(normalised_point, color)
