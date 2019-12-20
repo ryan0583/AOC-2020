@@ -23,20 +23,34 @@ class Droid:
             self.portals.add(key)
             if key == "ZZ":
                 return
+            if key == "LN":
+                print("FOUND LN")
             portal_points = portal_map.get(key)
-            teleport_point = None
+            key_point = None
             for portal_point in portal_points:
                 if next_point not in portal_point:
-                    teleport_point = next(iter(portal_point))
-            if teleport_point is not None:
-                droids_to_add.append(self.clone(N, teleport_point))
-                droids_to_add.append(self.clone(S, teleport_point))
-                droids_to_add.append(self.clone(E, teleport_point))
-                droids_to_add.append(self.clone(W, teleport_point))
+                    key_point = next(iter(portal_point))
+            if key_point is not None:
+                space_point = find_space_point(key_point, maze_map)
+
+                up_clone = self.clone(N, space_point)
+                up_clone.path.append(space_point)
+                droids_to_add.append(up_clone)
+                down_clone = self.clone(S, space_point)
+                down_clone.path.append(space_point)
+                droids_to_add.append(down_clone)
+                right_clone = self.clone(E, space_point)
+                right_clone.path.append(space_point)
+                droids_to_add.append(right_clone)
+                left_clone = self.clone(W, space_point)
+                left_clone.path.append(space_point)
+                droids_to_add.append(left_clone)
 
         def can_move_to_space(_next_char):
-            return _next_char is not None and (
-                    _next_char == SPACE or (maze_map[self.point].isupper() and _next_char.isupper))
+            return _next_char == SPACE
+
+        def can_teleport_on_next_space(_next_char):
+            return _next_char.isupper()
 
         droids_to_add = []
         droid_to_remove = None
@@ -49,8 +63,7 @@ class Droid:
         can_move = can_move_to_space(next_char)
 
         if can_move:
-            if maze_map[self.point] == SPACE and next_char == SPACE:
-                self.path.append(self.point)
+            self.path.append(self.point)
             self.point = next_point
             can_turn_left = can_move_to_space(maze_map.get(get_next_point(turn_left(self.direction), self.point)))
             can_turn_right = can_move_to_space(maze_map.get(get_next_point(turn_right(self.direction), self.point)))
@@ -60,7 +73,7 @@ class Droid:
 
             if can_turn_right:
                 droids_to_add.append(self.clone(turn_right(self.direction), self.point))
-        elif next_char.isupper():
+        elif can_teleport_on_next_space(next_char):
             droid_to_remove = self
             teleport()
         else:
@@ -78,6 +91,43 @@ class Droid:
 
     def __hash__(self):
         return hash(str(self))
+
+
+def find_space_point(key_point, maze_map):
+    space_point = None
+    if maze_map.get(move_up(key_point, 1)) == SPACE:
+        space_point = move_up(key_point, 1)
+    elif maze_map.get(move_up(key_point, 2)) == SPACE:
+        space_point = move_up(key_point, 2)
+    elif maze_map.get(move_down(key_point, 1)) == SPACE:
+        space_point = move_down(key_point, 1)
+    elif maze_map.get(move_down(key_point, 2)) == SPACE:
+        space_point = move_down(key_point, 2)
+    elif maze_map.get(move_left(key_point, 1)) == SPACE:
+        space_point = move_left(key_point, 1)
+    elif maze_map.get(move_left(key_point, 2)) == SPACE:
+        space_point = move_left(key_point, 2)
+    elif maze_map.get(move_right(key_point, 1)) == SPACE:
+        space_point = move_right(key_point, 1)
+    elif maze_map.get(move_right(key_point, 2)) == SPACE:
+        space_point = move_right(key_point, 2)
+    return space_point
+
+
+def move_up(point, amount):
+    return Point(point.x, point.y - amount)
+
+
+def move_down(point, amount):
+    return Point(point.x, point.y + amount)
+
+
+def move_left(point, amount):
+    return Point(point.x - amount, point.y)
+
+
+def move_right(point, amount):
+    return Point(point.x + amount, point.y)
 
 
 def get_next_point(direction, current_point):
@@ -115,6 +165,8 @@ def map_color(char):
         return "black"
     if char == WALL:
         return "white"
+    if char == "Z":
+        return "red"
     if char.isupper():
         return "yellow"
 
@@ -124,13 +176,13 @@ def get_teleport_key(char, point, maze_map):
     point2 = None
     point2 = Point(point.x, point.y + 1)
     char2 = maze_map.get(point2)
-    if char2 is not None and not char2.isupper():
+    if char2 is None or not char2.isupper():
         point2 = Point(point.x, point.y - 1)
         char2 = maze_map.get(point2)
-    if char2 is not None and not char2.isupper():
+    if char2 is None or not char2.isupper():
         point2 = Point(point.x + 1, point.y)
         char2 = maze_map.get(point2)
-    if char2 is not None and not char2.isupper():
+    if char2 is None or not char2.isupper():
         point2 = Point(point.x - 1, point.y)
         char2 = maze_map.get(point2)
 
@@ -165,7 +217,7 @@ def part_one():
 
     lines = open("input.txt", "r").read().splitlines()
 
-    panel = GraphicsPanel.create_empty_panel(200, 200)
+    panel = GraphicsPanel.create_empty_panel(300, 300)
     panel.init_canvas()
 
     maze_map = {}
@@ -182,7 +234,7 @@ def part_one():
 
     panel.paint_canvas()
 
-    start_point = next(iter(portal_map.get("AA")[0]))
+    start_point = find_space_point(next(iter(portal_map.get("AA")[0])), maze_map)
 
     droids = [Droid([], start_point, N, set("AA")),
               Droid([], start_point, S, set("AA")),
