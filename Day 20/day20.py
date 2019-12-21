@@ -165,8 +165,6 @@ def map_color(char):
         return "black"
     if char == WALL:
         return "white"
-    if char == "Z":
-        return "red"
     if char.isupper():
         return "yellow"
 
@@ -208,7 +206,7 @@ def part_one():
             if chars[x + 1].isupper():
                 char2 = chars[x + 1]
         if char2 is not None:
-            print("found " + char + char2 + " at point " + str(point))
+            # print("found " + char + char2 + " at point " + str(point))
             point_list = portal_map.get(char + char2)
             if point_list is None:
                 portal_map[char + char2] = [{point, point2}]
@@ -232,6 +230,14 @@ def part_one():
             if char.isupper():
                 add_to_portal_map()
 
+    points = portal_map.get("AA")[0]
+    for point in points:
+        panel.update_canvas(point, "green")
+
+    points = portal_map.get("ZZ")[0]
+    for point in points:
+        panel.update_canvas(point, "red")
+
     panel.paint_canvas()
 
     start_point = find_space_point(next(iter(portal_map.get("AA")[0])), maze_map)
@@ -244,7 +250,7 @@ def part_one():
     winning_droid = None
 
     while winning_droid is None:
-        print("Droid count: " + str(len(droids)))
+        # print("Droid count: " + str(len(droids)))
         droids_to_add = []
         droids_to_remove = set()
         for droid in droids:
