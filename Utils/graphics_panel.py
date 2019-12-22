@@ -53,11 +53,11 @@ class GraphicsPanel:
 
     def add_text(self, text, color):
         self.text_component = self.canvas.create_text(GAME_SCALE * 2, GAME_SCALE * 2, fill=color,
-                                font="Arial " + str(GAME_SCALE - GAME_SCALE // 2), anchor="w",
+                                font="Courier " + str(GAME_SCALE - GAME_SCALE // 2), anchor="w",
                                 text=text)
 
     def update_text(self, text):
         self.canvas.itemconfigure(self.text_component, text=text)
 
 
-GAME_SCALE = 6
+GAME_SCALE = 30

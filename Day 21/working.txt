@@ -1,0 +1,56 @@
+Part 1
+======
+
+  @
+ @ @
+@   @
+## ###
+
+
+jump if:
+
+gap at A, ground at D
+gap at B, ground at D
+gap at C, ground at D 
+
+
+NOT A J
+NOT B T
+OR T J
+NOT C T
+OR T J
+AND D J
+WALK
+
+
+Part 2
+======
+
+
+      @   @   
+     @ @ @ @ 
+    @   @   @ 
+##### ###   X####
+     ABCDEFGHI
+
+
+if no ground at E, must be ground at H
+
+NOT E T - if no ground at E, then T is true, if ground at E then T is false 
+NOT T T - if no ground at E then T is false, if ground at E then T is true
+OR H T - T is True if there is ground at E, or if there is ground at H
+AND T J - jump if the logic from part one is met, plus if there is ground at either E or H.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
