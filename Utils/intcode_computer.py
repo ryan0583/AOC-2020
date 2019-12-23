@@ -27,6 +27,7 @@ class IntcodeComputer:
         self.input_count = 0
         self.rel_offset = 0
         self.next_instruction = None
+        self.idle = False
 
     def reset(self, ints):
         self.ints = list(ints)
@@ -48,6 +49,9 @@ class IntcodeComputer:
         new_computer.input_count = other_computer.input_count
         new_computer.rel_offset = other_computer.rel_offset
         return new_computer
+
+    def is_idle(self):
+        return self.idle and self.input_count >= len(self.inputs)
 
     def is_running(self):
         return self.opcode != STOP
@@ -110,11 +114,13 @@ class IntcodeComputer:
 
         def perform_input():
             write_index = get_write_index_and_grow(self.next_instruction.param1_mode, self.index + 1)
-            if self.input_count <= len(self.inputs) - 1:
+            if self.input_count >= len(self.inputs):
+                self.ints[write_index] = -1
+                self.idle = True
+            else:
                 self.ints[write_index] = self.inputs[self.input_count]
                 self.input_count += 1
-            else:
-                self.ints[write_index] = -1
+                self.idle = False
             return self.index + 2
 
         def perform_add():
