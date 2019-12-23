@@ -2,7 +2,7 @@ from Utils import debug_tools
 
 
 class IntcodeComputer:
-    class __Instruction:
+    class Instruction:
         def __init__(self, value):
             self.opcode = value[len(value) - 2:] if len(value) > 1 else "0" + value[len(value) - 1:]
             self.param1_mode = value[len(value) - 3:len(value) - 2] if len(value) > 2 else PARAM_MODE_POSITION
@@ -26,6 +26,7 @@ class IntcodeComputer:
         self.last_output = 0
         self.input_count = 0
         self.rel_offset = 0
+        self.next_instruction = None
 
     def reset(self, ints):
         self.ints = list(ints)
@@ -63,7 +64,7 @@ class IntcodeComputer:
     def write_mem_addr(self, addr, val):
         self.ints[addr] = val
 
-    def process(self):
+    def process_single_instruction(self):
         def grow_list(new_size):
             self.ints += [0] * (new_size - len(self.ints) + 1)
 
@@ -76,14 +77,14 @@ class IntcodeComputer:
                 PARAM_MODE_POSITION: lambda: self.ints[index],
                 PARAM_MODE_RELATIVE: lambda: self.ints[index] + self.rel_offset
             }
-            return param_mode_switcher.get(param_mode, lambda: debug_tools.raise_("Invalid param mode" + param_mode))()
+            return param_mode_switcher.get(param_mode, lambda: debug_tools.raise_(Exception("Invalid param mode " + param_mode)))()
 
         def read_value(param_mode, index):
             return read_value_at_position(get_index(param_mode, index))
 
         def read_values():
-            return (read_value(next_instruction.param1_mode, self.index + 1),
-                    read_value(next_instruction.param2_mode, self.index + 2))
+            return (read_value(self.next_instruction.param1_mode, self.index + 1),
+                    read_value(self.next_instruction.param2_mode, self.index + 2))
 
         def add(val1, val2):
             return val1 + val2
@@ -103,14 +104,17 @@ class IntcodeComputer:
             return write_index
 
         def perform_logic_and_write(func):
-            write_index = get_write_index_and_grow(next_instruction.param3_mode, self.index + 3)
+            write_index = get_write_index_and_grow(self.next_instruction.param3_mode, self.index + 3)
             self.ints[write_index] = func(*read_values())
             return self.index + 4
 
         def perform_input():
-            write_index = get_write_index_and_grow(next_instruction.param1_mode, self.index + 1)
-            self.ints[write_index] = self.inputs[self.input_count]
-            self.input_count += 1
+            write_index = get_write_index_and_grow(self.next_instruction.param1_mode, self.index + 1)
+            if self.input_count <= len(self.inputs) - 1:
+                self.ints[write_index] = self.inputs[self.input_count]
+                self.input_count += 1
+            else:
+                self.ints[write_index] = -1
             return self.index + 2
 
         def perform_add():
@@ -134,18 +138,18 @@ class IntcodeComputer:
             return perform_logic_and_write(equals)
 
         def perform_output():
-            self.last_output = read_value(next_instruction.param1_mode, self.index + 1)
+            self.last_output = read_value(self.next_instruction.param1_mode, self.index + 1)
             return self.index + 2
 
         def perform_adjust_rel_offset():
-            self.rel_offset += read_value(next_instruction.param1_mode, self.index + 1)
+            self.rel_offset += read_value(self.next_instruction.param1_mode, self.index + 1)
             return self.index + 2
 
         def should_return_output():
             return self.opcode == OUTPUT and self.return_on_output
 
         def invalid_output():
-            return self.opcode == OUTPUT and not next_instruction.is_stop() and self.last_output != 0
+            return self.opcode == OUTPUT and not self.next_instruction.is_stop() and self.last_output != 0
 
         opcode_switcher = {
             ADD: perform_add,
@@ -159,20 +163,27 @@ class IntcodeComputer:
             ADJUST_REL_OFFSET: perform_adjust_rel_offset
         }
 
-        next_instruction = self.__Instruction(str(self.ints[self.index]))
-        self.opcode = next_instruction.opcode
-        while self.is_running():
+        if self.is_running():
             self.index = opcode_switcher.get(self.opcode,
                                              lambda: debug_tools.raise_(Exception("Invalid opcode" + self.opcode)))()
 
-            next_instruction = self.__Instruction(str(self.ints[self.index]))
+            self.next_instruction = self.Instruction(str(self.ints[self.index]))
 
             if should_return_output():
-                break
+                return self.last_output
             if invalid_output():
                 raise Exception("Expected last output to be 0, but was " + str(self.last_output))
 
-            self.opcode = next_instruction.opcode
+            self.opcode = self.next_instruction.opcode
+        return None
+
+    def process(self):
+        self.next_instruction = self.Instruction(str(self.ints[self.index]))
+        self.opcode = self.next_instruction.opcode
+        while self.is_running():
+            output = self.process_single_instruction()
+            if output is not None:
+                break
 
         return self.last_output
 

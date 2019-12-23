@@ -26,10 +26,17 @@ def process(phase_sequences):
         last_output = 0
         amps = list(map(lambda phase: IntcodeComputer([phase], "input.txt", True), phase_sequence))
 
+        for amp in amps:
+            amp.next_instruction = IntcodeComputer.Instruction(str(amp.ints[amp.index]))
+            amp.opcode = amp.next_instruction.opcode
+
         while amps[len(amps) - 1].is_running():
             for amp in amps:
                 amp.append_input(last_output)
-                last_output = amp.process()
+                last_output = amp.process_single_instruction()
+                while last_output is None:
+                    last_output = amp.process_single_instruction()
+                amp.opcode = amp.next_instruction.opcode
 
         return last_output
 
