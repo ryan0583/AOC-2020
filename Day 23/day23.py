@@ -45,6 +45,7 @@ def main_loop(computers, computer_instruction_map, written_ys, nat_packet, idle_
                     if existing_packet.address == 255:
                         nat_packet = existing_packet
                     else:
+                        print(str(existing_packet.address) + ", " + str(existing_packet.x) + ", " + str(existing_packet.y))
                         computers[existing_packet.address].append_input(existing_packet.x)
                         computers[existing_packet.address].append_input(existing_packet.y)
                     del computer_instruction_map[i]
@@ -54,7 +55,7 @@ def main_loop(computers, computer_instruction_map, written_ys, nat_packet, idle_
             computer.opcode = computer.next_instruction.opcode
             idle_count = 0
         elif nat_packet is not None and all_idle(computers):
-            if idle_count == 8000:
+            if idle_count == 10000:
                 print("all idle")
                 computers[0].append_input(nat_packet.x)
                 computers[0].append_input(nat_packet.y)
@@ -99,5 +100,5 @@ def part2():
         nat_packet, idle_count, done = main_loop(computers, computer_instruction_map, written_ys, nat_packet, idle_count)
 
 
-# part1()
-part2()
+part1()
+# part2()
