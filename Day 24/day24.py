@@ -1,7 +1,7 @@
 from Utils.file_parser import FileParser
 from Utils.graphics_panel import GraphicsPanel
 from Utils.point import Point
-
+import time
 
 class Layer:
     def __init__(self):
@@ -12,6 +12,8 @@ class Layer:
         self.new_parent = None
         self.new_bug_point_map = {}
         self.layer_number = 0
+        self.graphics_panel = GraphicsPanel.create_empty_panel(5, 5)
+        self.graphics_panel.init_canvas()
 
     def get_total_bug_count(self):
         return len(self.bug_point_map.keys())
@@ -104,26 +106,31 @@ class Layer:
 
         return len(list(filter(lambda _char: _char is not None, chars)))
 
+    def update_bug_map(self, point, count):
+        char = self.bug_point_map.get(point)
+        if char is not None:
+            if count == 1:
+                self.new_bug_point_map[point] = BUG
+        else:
+            if count == 1 or count == 2:
+                self.new_bug_point_map[point] = BUG
+
     def process_inner_edge(self):
         top_inner_point = Point(2, 1)
         top_inner_count = self.get_top_inner_adjacent_count(top_inner_point)
-        if top_inner_count == 1 or top_inner_count == 2:
-            self.new_bug_point_map[top_inner_point] = BUG
+        self.update_bug_map(top_inner_point, top_inner_count)
 
         left_inner_point = Point(1, 2)
         left_inner_count = self.get_left_inner_adjacent_count(left_inner_point)
-        if left_inner_count == 1 or left_inner_count == 2:
-            self.new_bug_point_map[left_inner_point] = BUG
+        self.update_bug_map(left_inner_point, left_inner_count)
 
         bottom_inner_point = Point(2, 3)
         bottom_inner_count = self.get_bottom_inner_adjacent_count(bottom_inner_point)
-        if bottom_inner_count == 1 or bottom_inner_count == 2:
-            self.new_bug_point_map[bottom_inner_point] = BUG
+        self.update_bug_map(bottom_inner_point, bottom_inner_count)
 
         right_inner_point = Point(3, 2)
         right_inner_count = self.get_right_inner_adjacent_count(right_inner_point)
-        if right_inner_count == 1 or right_inner_count == 2:
-            self.new_bug_point_map[right_inner_point] = BUG
+        self.update_bug_map(right_inner_point, right_inner_count)
 
     def get_top_outer_adjacent_count(self, point):
         down_char = self.bug_point_map.get(Point(point.x, point.y + 1))
@@ -241,26 +248,22 @@ class Layer:
         top_edge_points = get_top_edge_points()
         for point in top_edge_points:
             adjacent_count = self.get_top_outer_adjacent_count(point)
-            if adjacent_count == 1 or adjacent_count == 2:
-                self.new_bug_point_map[point] = BUG
+            self.update_bug_map(point, adjacent_count)
 
         bottom_edge_points = get_bottom_edge_points()
         for point in bottom_edge_points:
             adjacent_count = self.get_bottom_outer_adjacent_count(point)
-            if adjacent_count == 1 or adjacent_count == 2:
-                self.new_bug_point_map[point] = BUG
+            self.update_bug_map(point, adjacent_count)
 
         left_edge_points = get_left_edge_points()
         for point in left_edge_points:
             adjacent_count = self.get_left_outer_adjacent_count(point)
-            if adjacent_count == 1 or adjacent_count == 2:
-                self.new_bug_point_map[point] = BUG
+            self.update_bug_map(point, adjacent_count)
 
         right_edge_points = get_right_edge_points()
         for point in right_edge_points:
             adjacent_count = self.get_right_outer_adjacent_count(point)
-            if adjacent_count == 1 or adjacent_count == 2:
-                self.new_bug_point_map[point] = BUG
+            self.update_bug_map(point, adjacent_count)
 
     def spawn_child(self):
         if self.child is not None:
@@ -268,7 +271,7 @@ class Layer:
 
         bug_count = self.get_bug_count([Point(2, 1), Point(1, 2), Point(2, 3), Point(3, 2)])
         if bug_count > 0:
-            print("spawned child")
+            # print("spawned child")
             self.new_child = Layer()
             self.new_child.parent = self
             self.new_child.layer_number = self.layer_number + 1
@@ -314,7 +317,7 @@ class Layer:
                 or bottom_edge_bug_count == 1 or bottom_edge_bug_count == 2 \
                 or left_edge_bug_count == 1 or left_edge_bug_count == 2 \
                 or right_edge_bug_count == 1 or right_edge_bug_count == 2:
-            print("spawned parent")
+            # print("spawned parent")
             self.new_parent = Layer()
             self.new_parent.child = self
             self.new_parent.layer_number = self.layer_number - 1
@@ -335,8 +338,7 @@ class Layer:
         simple_points = [Point(1, 1), Point(3, 1), Point(1, 3), Point(3, 3)]
         for point in simple_points:
             adjacent_count = self.get_adjacent_count(point)
-            if adjacent_count == 1 or adjacent_count == 2:
-                self.new_bug_point_map[point] = BUG
+            self.update_bug_map(point, adjacent_count)
 
         self.process_inner_edge()
 
@@ -368,6 +370,14 @@ class Layer:
                 power = power * 2
         return _biodiversity
 
+    def update_canvas(self):
+        self.graphics_panel.reset()
+        for _point in self.bug_point_map.keys():
+            self.graphics_panel.update_canvas(_point, "red")
+
+    def paint(self):
+        self.graphics_panel.paint_canvas()
+
 
 def get_top_edge_points():
     return [Point(0, 0), Point(1, 0), Point(2, 0), Point(3, 0), Point(4, 0)]
@@ -386,13 +396,6 @@ def get_right_edge_points():
 
 
 def part1():
-    def update_canvas():
-        for _point in layer.bug_point_map.keys():
-            graphics_panel.update_canvas(_point, "red")
-
-    graphics_panel = GraphicsPanel.create_empty_panel(30, 30)
-    graphics_panel.init_canvas()
-    graphics_panel.paint_canvas()
 
     file_parser = FileParser("input.txt")
 
@@ -400,8 +403,8 @@ def part1():
     layer.bug_point_map = file_parser.read_points_map(BUG)
     seen_layouts = set()
 
-    update_canvas()
-    graphics_panel.paint_canvas()
+    layer.update_canvas()
+    layer.paint()
     # time.sleep(2)
 
     while True:
@@ -409,19 +412,11 @@ def part1():
             for x in range(0, 5):
                 point = Point(x, y)
                 adjacent_count = layer.get_adjacent_count(point)
-                char = layer.bug_point_map.get(point)
-                if char is not None:
-                    if adjacent_count == 1:
-                        layer.new_bug_point_map[point] = BUG
-                else:
-                    if adjacent_count == 1 or adjacent_count == 2:
-                        layer.new_bug_point_map[point] = BUG
+                layer.update_bug_map(point, adjacent_count)
 
         layer.update_bug_point_map()
-
-        graphics_panel.reset()
-        update_canvas()
-        graphics_panel.paint_canvas()
+        layer.update_canvas()
+        layer.paint()
 
         biodiversity = layer.calculate_biodiversity()
         if biodiversity in seen_layouts:
@@ -434,13 +429,14 @@ def part1():
 
 
 def part2():
-    file_parser = FileParser("testinput.txt")
+    file_parser = FileParser("input.txt")
 
     top_layer = Layer()
     top_layer.bug_point_map = file_parser.read_points_map(BUG)
     minutes = 0
 
-    while minutes < 10:
+    while minutes < 200:
+        print(minutes)
         layer = top_layer
         while layer is not None:
             layer.part_2_process()
@@ -455,17 +451,25 @@ def part2():
 
         if top_layer.parent is not None:
             top_layer = top_layer.parent
+
+        layer = top_layer
+        while layer is not None:
+            # layer.update_canvas()
+            # layer.paint()
+            layer = layer.child
+
         minutes += 1
-        print(minutes)
+        # print(minutes)
 
     bug_count = 0
     layer = top_layer
     while layer is not None:
-        print(str(layer.layer_number) + ": " + str(layer.get_total_bug_count()))
+        # print(str(layer.layer_number) + ": " + str(layer.get_total_bug_count()))
         bug_count += layer.get_total_bug_count()
         layer = layer.child
 
     print(bug_count)
+    input("press any key")
 
 
 BUG = "#"
