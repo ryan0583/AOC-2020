@@ -1,27 +1,35 @@
-import math
+def part_one(lines):
+    done = False
+    for line1 in lines:
+        for line2 in lines:
+            result = int(line1) + int(line2)
+            if result == 2020:
+                print(int(line1) * int(line2))
+                done = True
+                break
+        if done:
+            break
 
 
-def calculate_fuel(function_to_run):
-    total = 0
-    for line in lines:
-        total += function_to_run(line)
-    print(total)
-
-
-def calculate_fuel_part_one(line):
-    return math.floor(int(line) / 3) - 2
-
-
-def calculate_fuel_part_two(line):
-    fuel = 0
-    next_fuel = math.floor(int(line) / 3) - 2
-    while next_fuel > 0:
-        fuel += next_fuel
-        next_fuel = math.floor(int(next_fuel) / 3) - 2
-    return fuel
+def part_two(lines):
+    done = False
+    for line1 in lines:
+        for line2 in lines:
+            sum2 = int(line1) + int(line2)
+            if sum2 < 2020:
+                for line3 in lines:
+                    result = sum2 + int(line3)
+                    if result == 2020:
+                        print(int(line1) * int(line2) * int(line3))
+                        done = True
+                        break
+            if done:
+                break
+        if done:
+            break
 
 
 file = open("Input.txt", "r")
-lines = file.readlines()
-calculate_fuel(calculate_fuel_part_one)
-calculate_fuel(calculate_fuel_part_two)
+rows = file.readlines()
+part_one(rows)
+part_two(rows)
