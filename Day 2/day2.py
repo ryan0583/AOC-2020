@@ -49,13 +49,17 @@ def part2_isvalid(policy_and_password):
 
 
 def process(is_valid):
-    lines = open("Input.txt", "r").readlines()
-    valid_count = 0
-    for line in lines:
-        policy_and_password = PolicyAndPassword(line)
-        if is_valid(policy_and_password):
-            valid_count = valid_count + 1
-    return valid_count
+    return len(
+        list(
+            filter(
+                is_valid,
+                map(
+                    PolicyAndPassword,
+                    open("Input.txt", "r").readlines()
+                )
+            )
+        )
+    )
 
 
 def part1():
