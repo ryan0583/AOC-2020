@@ -1,8 +1,12 @@
+from Utils.file_reader import read_lines
+
+
 class Policy:
     def __init__(self, policy_str):
-        self._num1 = int(policy_str.split("-")[0])
-        self._num2 = int(policy_str.split("-")[1].split(" ")[0])
-        self._letter = policy_str.split("-")[1].split(" ")[1]
+        policy_parts = policy_str.split("-")
+        self._num1 = int(policy_parts[0])
+        self._num2 = int(policy_parts[1].split(" ")[0])
+        self._letter = policy_parts[1].split(" ")[1]
 
     def get_num1(self):
         return self._num1
@@ -49,13 +53,14 @@ def part2_isvalid(policy_and_password):
 
 
 def process(is_valid):
+    lines = read_lines()
     return len(
         list(
             filter(
                 is_valid,
                 map(
                     PolicyAndPassword,
-                    open("Input.txt", "r").readlines()
+                    lines
                 )
             )
         )

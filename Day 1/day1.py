@@ -1,31 +1,24 @@
-def read_lines():
-    return list(map(int, open("Input.txt", "r").readlines()))
+from Utils.file_reader import read_lines
+
+
+def remainder_in_list(number, lines):
+    return (2020 - int(number)) in lines
 
 
 def part1():
-    lines = read_lines()
-
-    def remainder_in_list(number):
-        return (2020 - int(number)) in lines
-
-    match = next(filter(remainder_in_list, lines))
+    lines = list(map(int, read_lines()))
+    match = next(filter(lambda number: remainder_in_list(number, lines), lines))
     return match * (2020 - match)
 
 
 def part2():
-    lines = read_lines()
-
-    def sum_less_than_required(number):
-        return
+    lines = list(map(int, read_lines()))
 
     for line1 in lines:
         for line2 in lines:
             sum2 = int(line1) + int(line2)
-            if sum2 < 2020:
-                for line3 in lines:
-                    result = sum2 + int(line3)
-                    if result == 2020:
-                        return int(line1) * int(line2) * int(line3)
+            if remainder_in_list(sum2, lines):
+                return line1 * line2 * (2020 - sum2)
 
 
 print(part1())
