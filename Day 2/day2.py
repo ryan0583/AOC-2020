@@ -1,24 +1,70 @@
-def part_one(lines):
+class Policy:
+    def __init__(self, policy_str):
+        self._num1 = int(policy_str.split("-")[0])
+        self._num2 = int(policy_str.split("-")[1].split(" ")[0])
+        self._letter = policy_str.split("-")[1].split(" ")[1]
+
+    def get_num1(self):
+        return self._num1
+
+    def get_num2(self):
+        return self._num2
+
+    def get_letter(self):
+        return self._letter
+
+
+class PolicyAndPassword:
+    def __init__(self, line):
+        line_parts = line.split(":")
+        self._policy = Policy(line_parts[0])
+        self._password = line_parts[1].lstrip()
+
+    def get_policy(self):
+        return self._policy
+
+    def get_password(self):
+        return self._password
+
+
+def part1_isvalid(policy_and_password):
+    policy = policy_and_password.get_policy()
+    actual_letter_count = int(policy_and_password.get_password().count(policy.get_letter()))
+    if policy.get_num1() <= actual_letter_count <= policy.get_num2():
+        return True
+    return False
+
+
+def part2_isvalid(policy_and_password):
+    password = policy_and_password.get_password()
+    policy = policy_and_password.get_policy()
+    pos_1_match = password[policy.get_num1() - 1] == policy.get_letter()
+    pos_2_match = password[policy.get_num2() - 1] == policy.get_letter()
+    both_match = pos_1_match and pos_2_match
+    one_matches = pos_1_match or pos_2_match
+
+    if one_matches and not both_match:
+        return True
+    return False
+
+
+def process(is_valid):
+    lines = open("Input.txt", "r").readlines()
     valid_count = 0
     for line in lines:
-        line_parts = line.split(":")
-        policy = line_parts[0]
-        password = line_parts[1]
-        letter_counts = policy.split("-")
-        max_count_and_letter = letter_counts[1].split(" ")
-        min_count = int(letter_counts[0])
-        print(min_count)
-        max_count = int(max_count_and_letter[0])
-        print(max_count)
-        letter = max_count_and_letter[1]
-        print(letter)
-        actual_letter_count = int(password.count(letter))
-        print(actual_letter_count)
-        if min_count <= actual_letter_count <= max_count:
+        policy_and_password = PolicyAndPassword(line)
+        if is_valid(policy_and_password):
             valid_count = valid_count + 1
-    print(valid_count)
+    return valid_count
 
 
-file = open("Input.txt", "r")
-rows = file.readlines()
-part_one(rows)
+def part1():
+    return process(part1_isvalid)
+
+
+def part2():
+    return process(part2_isvalid)
+
+
+print(part1())
+print(part2())
