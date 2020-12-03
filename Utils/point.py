@@ -11,3 +11,9 @@ class Point:
 
     def __hash__(self):
         return hash(str(self))
+
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
