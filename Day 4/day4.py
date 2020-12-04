@@ -102,5 +102,5 @@ def part2():
 
 
 REQ_FIELDS = ['byr:', 'iyr:', 'eyr:', 'hgt:', 'hcl:', 'ecl:', 'pid:']
-# print(part1())
+print(part1())
 print(part2())
