@@ -35,9 +35,9 @@ def part2():
         value = int(parse_value(line, field_name, 8))
         if not value:
             return False
-        if value < start_year or value > end_year:
-            return False
-        return True
+        if start_year <= value <= end_year:
+            return True
+        return False
 
     def valid_eye_colour(line):
         valid_colours = ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']
@@ -70,7 +70,9 @@ def part2():
     def valid_height(line):
         value = parse_value(line, 'hgt', 9)
         if not value:
-            return False
+            value = parse_value(line, 'hgt', 8)
+            if not value:
+                return False
         if 'cm' in value:
             value = int(value[0:value.index('cm')])
             if 150 <= value <= 193:
@@ -89,7 +91,6 @@ def part2():
                 and valid_passport_id(passport) \
                 and valid_hair_colour(passport) \
                 and valid_height(passport)
-        print(valid)
         return valid
 
     return len(list(filter(lambda valid: valid, list(map(is_valid, read_passports())))))
