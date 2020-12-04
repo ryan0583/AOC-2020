@@ -19,11 +19,14 @@ def part1():
 
 
 def part2():
-    def parse_value(line, field_name, total_length):
+    def get_field_index(line, field_name):
         try:
-            field_index = line.index(field_name)
+            return line.index(field_name)
         except ValueError:
-            return False
+            return -1
+
+    def parse_value(line, field_name, total_length):
+        field_index = get_field_index(line, field_name)
         if field_index == -1:
             return False
         if len(line) < field_index + total_length:
@@ -59,20 +62,22 @@ def part2():
         return False
 
     def valid_passport_id(line):
-        value = parse_value(line, 'pid', 13)
+        value = parse_value(line, 'pid', 14)
         if not value:
-            return False
+            value = parse_value(line, 'pid', 13)
+            if not value:
+                return False
         value = value.rstrip()
         if len(value) == 9 and value.isdigit():
             return True
         return False
 
     def valid_height(line):
-        value = parse_value(line, 'hgt', 9)
-        if not value:
-            value = parse_value(line, 'hgt', 8)
-            if not value:
-                return False
+        field_index = get_field_index(line, 'hgt')
+        if field_index == -1:
+            return False
+
+        value = line[field_index + 4:len(line)]
         if 'cm' in value:
             value = int(value[0:value.index('cm')])
             if 150 <= value <= 193:
