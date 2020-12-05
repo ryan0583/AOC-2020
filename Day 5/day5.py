@@ -1,38 +1,50 @@
-from Utils.file_reader import read_lines
 import math
 
-
-def parse_row(char, existing_rows):
-    existing_length = len(existing_rows)
-    halfway = math.ceil(len(existing_rows) / 2)
-    if char == 'F':
-        return existing_rows[0:halfway]
-    elif char == 'B':
-        return existing_rows[halfway: existing_length]
+from Utils.file_reader import read_lines
 
 
-def parse_col(char, existing_cols):
-    existing_length = len(existing_cols)
-    halfway = math.ceil(len(existing_cols) / 2)
-    if char == 'L':
-        return existing_cols[0:halfway]
-    elif char == 'R':
-        return existing_cols[halfway: existing_length]
+def find_new_range(char, existing_range, front_char):
+    existing_length = len(existing_range)
+    halfway = math.ceil(existing_length / 2)
+    return existing_range[0:halfway] if char == front_char else existing_range[halfway: existing_length]
+
+
+def is_matching_char(char, front_char, back_char):
+    return char == front_char or char == back_char
+
+
+def process_line(line, front_char, back_char, initial_range):
+    ranges = [initial_range]
+    matching_chars = filter(lambda line_char: is_matching_char(line_char, front_char, back_char), line)
+    for char in matching_chars:
+        ranges.append(find_new_range(char, ranges[-1], front_char))
+    return ranges[-1][0]
+
+
+def get_seat_id(line):
+    row = process_line(line, 'F', 'B', list(range(128)))
+    col = process_line(line, 'L', 'R', list(range(8)))
+    return row * 8 + col
+
+
+def get_seat_ids():
+    return list(map(lambda line: get_seat_id(line), read_lines()))
 
 
 def part1():
-    seat_ids = []
-    lines = read_lines()
-    for line in lines:
-        rows = list(range(128))
-        cols = list(range(8))
-        for char in line:
-            if char == 'F' or char == 'B':
-                rows = parse_row(char, rows)
-            elif char == 'R' or char == 'L':
-                cols = parse_col(char, cols)
-        seat_ids.append(rows[0] * 8 + cols[0])
-    return max(seat_ids)
+    return max(get_seat_ids())
+
+
+def is_missing_seat_number(seat_id, seat_ids):
+    return seat_id not in seat_ids and seat_id - 1 in seat_ids and seat_id + 1
+
+
+def part2():
+    seat_ids = get_seat_ids()
+    return list(filter(
+        lambda seat_id: is_missing_seat_number(seat_id, seat_ids),
+        list(range(min(seat_ids), max(seat_ids)))))[0]
 
 
 print(part1())
+print(part2())
