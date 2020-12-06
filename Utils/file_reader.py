@@ -5,8 +5,8 @@ def read_lines():
     return lines
 
 
-def read_chunks():
-    file = open("Input.txt", "r")
+def read_chunks(filename):
+    file = open(filename, "r")
     lines = list(file.read().split("\n\n"))
     file.close()
     return lines

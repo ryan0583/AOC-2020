@@ -8,7 +8,7 @@ def part1():
                 return False
         return True
 
-    return len(list(filter(lambda valid: valid, list(map(is_valid, read_chunks())))))
+    return len(list(filter(lambda valid: valid, list(map(is_valid, read_chunks("Input.txt"))))))
 
 
 def part2():
@@ -91,7 +91,7 @@ def part2():
                 and valid_height(passport)
         return valid
 
-    return len(list(filter(lambda valid: valid, list(map(is_valid, read_chunks())))))
+    return len(list(filter(lambda valid: valid, list(map(is_valid, read_chunks("Input.txt"))))))
 
 
 REQ_FIELDS = ['byr:', 'iyr:', 'eyr:', 'hgt:', 'hcl:', 'ecl:', 'pid:']
