@@ -1,11 +1,4 @@
-import os
-
-
-def read_passports():
-    file = open("Input.txt", "r")
-    lines = list(file.read().split(os.linesep + os.linesep))
-    file.close()
-    return lines
+from Utils.file_reader import read_chunks
 
 
 def part1():
@@ -15,7 +8,7 @@ def part1():
                 return False
         return True
 
-    return len(list(filter(lambda valid: valid, list(map(is_valid, read_passports())))))
+    return len(list(filter(lambda valid: valid, list(map(is_valid, read_chunks())))))
 
 
 def part2():
@@ -98,7 +91,7 @@ def part2():
                 and valid_height(passport)
         return valid
 
-    return len(list(filter(lambda valid: valid, list(map(is_valid, read_passports())))))
+    return len(list(filter(lambda valid: valid, list(map(is_valid, read_chunks())))))
 
 
 REQ_FIELDS = ['byr:', 'iyr:', 'eyr:', 'hgt:', 'hcl:', 'ecl:', 'pid:']
