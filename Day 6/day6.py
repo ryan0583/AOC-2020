@@ -1,11 +1,11 @@
 from Utils.file_reader import read_chunks
 
 
-def get_any_yes_count(chunk):
+def get_any_yes_count(chunk: str) -> int:
     return len(set(chunk.replace("\n", "")))
 
 
-def get_all_yes_count(chunk):
+def get_all_yes_count(chunk: str) -> int:
     return len(set.intersection(*map(set, chunk.split("\n"))))
 
 
@@ -17,5 +17,6 @@ def part2():
     return sum(list(map(get_all_yes_count, read_chunks("Input.txt"))))
 
 
-print(part1())
-print(part2())
+if __name__ == '__main__':
+    print(part1())
+    print(part2())
