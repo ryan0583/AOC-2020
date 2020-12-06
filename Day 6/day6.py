@@ -6,16 +6,7 @@ def get_any_yes_count(chunk):
 
 
 def get_all_yes_count(chunk):
-    def find_common():
-        return list(set(person_answers).intersection(common_answers))
-
-    all_person_answers = chunk.split("\n")
-    common_answers = all_person_answers[0]
-
-    for person_answers in all_person_answers:
-        common_answers = find_common()
-
-    return len(common_answers)
+    return len(set.intersection(*map(set, chunk.split("\n"))))
 
 
 def part1():
