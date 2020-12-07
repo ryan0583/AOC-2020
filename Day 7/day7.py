@@ -22,29 +22,71 @@ def bags_containing_bag_colour(bag_map: dict, bag_colour):
 
 
 def part1():
-    def count_bags(bag_list, complete_bag_list):
-        new_count = 0
+    def populate_bag_list(bag_list):
         contain_directly = []
         for bag in bag_list:
             contain_directly.extend(bags_containing_bag_colour(bag_map, bag))
-            new_count += len(contain_directly)
 
-        contain_directly = set(contain_directly)
-        complete_bag_list.append(contain_directly)
+        complete_bag_list.append(set(contain_directly))
 
         if len(contain_directly) > 0:
-            count_bags(contain_directly, complete_bag_list)
+            populate_bag_list(contain_directly)
 
     bag_map = get_bag_map(read_lines())
     complete_bag_list = []
-    count_bags(['shinygold'], complete_bag_list)
-    print(complete_bag_list)
-
+    populate_bag_list(['shinygold'])
     unique_complete_bag_list = set.union(*complete_bag_list)
-
     print(unique_complete_bag_list)
 
-    print(len(unique_complete_bag_list))
+    return len(unique_complete_bag_list)
 
 
-part1()
+def bags_within_bag_colour(bag_map: dict, bag_colour):
+    bag_list = {}
+    if bag_colour in bag_map.keys():
+        for bag in bag_map.get(bag_colour).split(','):
+            if bag != 'noother':
+                bag_list[bag[1:len(bag)]] = bag[0]
+    return bag_list
+
+
+def part2():
+    def populate_bag_list(bags_to_check):
+        contained_directly = []
+        for bag in bags_to_check:
+            bags_within = bags_within_bag_colour(bag_map, bag)
+            if len(bags_within) > 0:
+                contained_directly.append(bags_within)
+
+        if len(contained_directly) > 0:
+            complete_bag_list.append(contained_directly)
+
+        if len(contained_directly) > 0:
+            for bag_counts in contained_directly:
+                populate_bag_list(bag_counts.keys())
+
+    bag_map = get_bag_map(read_lines())
+    complete_bag_list = []
+    populate_bag_list(['shinygold'])
+
+    flat_list = []
+
+    for thing in complete_bag_list:
+        flat_list.extend(thing)
+
+    final_map = {}
+
+    for this_map in flat_list:
+        for key in this_map.keys():
+            if key in final_map.keys():
+                final_map[key] = int(final_map.get(key)) + int(this_map.get(key))
+            else:
+                final_map[key] = int(this_map.get(key))
+
+    print(final_map)
+    print(sum(final_map.values()))
+
+
+# print(part1())
+
+part2()
