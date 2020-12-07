@@ -13,7 +13,7 @@ def get_bag_map(lines):
     return bag_map
 
 
-def bags_containing_bag_colour(bag_map: dict, bag_colour):
+def bags_containing_bag_colour(bag_map, bag_colour):
     bag_list = []
     for outer_bag in bag_map.keys():
         if bag_colour in bag_map.get(outer_bag):
@@ -36,12 +36,11 @@ def part1():
     complete_bag_list = []
     populate_bag_list(['shinygold'])
     unique_complete_bag_list = set.union(*complete_bag_list)
-    print(unique_complete_bag_list)
 
     return len(unique_complete_bag_list)
 
 
-def bags_within_bag_colour(bag_map: dict, bag_colour, multiplier):
+def bags_within_bag_colour(bag_map, bag_colour, multiplier):
     bag_list = {}
     if bag_colour in bag_map.keys():
         for bag in bag_map.get(bag_colour).split(','):
@@ -83,10 +82,8 @@ def part2():
             else:
                 final_map[key] = int(this_map.get(key))
 
-    print(final_map)
     return sum(final_map.values())
 
 
-# print(part1())
-
+print(part1())
 print(part2())
