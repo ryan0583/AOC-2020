@@ -1,88 +1,75 @@
+from itertools import chain
+
 from Utils.file_reader import read_lines
 
 
 def get_bag_map(lines):
-    bag_map = {}
+    def strip_formatting(substring):
+        return substring.replace('bags', '') \
+            .replace('bag', '') \
+            .replace(' ', '') \
+            .replace('\n', '') \
+            .replace('.', '')
+
+    def get_key(this_line):
+        contains_index = this_line.find(contain)
+        return strip_formatting(this_line[0:contains_index])
+
+    def get_value(this_line):
+        contains_index = this_line.find(contain)
+        return strip_formatting(this_line[contains_index + len(contain) + 1:len(this_line)])
+
     contain = 'contain'
-    for line in lines:
-        contains_index = line.find(contain)
-        outer_bag = line[0:contains_index].replace('bags', '').replace('bag', '').replace(' ', '')
-        inner_bags = line[contains_index + len(contain) + 1:len(line)].replace('bags', '').replace('bag', '').replace(
-            ' ', '').replace('\n', '').replace('.', '')
-        bag_map[outer_bag] = inner_bags
-    return bag_map
-
-
-def bags_containing_bag_colour(bag_map, bag_colour):
-    bag_list = []
-    for outer_bag in bag_map.keys():
-        if bag_colour in bag_map.get(outer_bag):
-            bag_list.append(outer_bag)
-    return bag_list
+    return {get_key(line): get_value(line) for line in lines}
 
 
 def part1():
+    def bags_containing_bag_colour(bag_colour):
+        return filter(lambda key: bag_colour in bag_map.get(key), bag_map.keys())
+
     def populate_bag_list(bag_list):
-        contain_directly = []
-        for bag in bag_list:
-            contain_directly.extend(bags_containing_bag_colour(bag_map, bag))
+        if len(bag_list) == 0:
+            return
 
-        complete_bag_list.append(set(contain_directly))
-
-        if len(contain_directly) > 0:
-            populate_bag_list(contain_directly)
+        contain_directly = list(chain.from_iterable(map(bags_containing_bag_colour, bag_list)))
+        complete_bag_list.update(set(contain_directly))
+        populate_bag_list(contain_directly)
 
     bag_map = get_bag_map(read_lines())
-    complete_bag_list = []
+    complete_bag_list = set()
     populate_bag_list(['shinygold'])
-    unique_complete_bag_list = set.union(*complete_bag_list)
 
-    return len(unique_complete_bag_list)
-
-
-def bags_within_bag_colour(bag_map, bag_colour, multiplier):
-    bag_list = {}
-    if bag_colour in bag_map.keys():
-        for bag in bag_map.get(bag_colour).split(','):
-            if bag != 'noother':
-                bag_list[bag[1:len(bag)]] = int(bag[0]) * multiplier
-    return bag_list
+    return len(complete_bag_list)
 
 
 def part2():
-    def populate_bag_list(bag_map_to_chack):
-        contained_directly = []
-        for bag in bag_map_to_chack.keys():
-            bags_within = bags_within_bag_colour(bag_map, bag, bag_map_to_chack.get(bag))
-            if len(bags_within) > 0:
-                contained_directly.append(bags_within)
+    def has_count(bag):
+        return bag != 'noother'
+
+    def bags_within_bag_colour(bag_count_item):
+        bag_count_list = list(filter(has_count, bag_map.get(bag_count_item[0]).split(',')))
+        return {bag[1:len(bag)]: int(bag[0]) * bag_count_item[1] for bag in bag_count_list}
+
+    def bags_within_non_empty(bags_within):
+        return len(bags_within) > 0
+
+    def get_contained_directly(bag_count_items):
+        return list(filter(bags_within_non_empty, map(bags_within_bag_colour, bag_count_items)))
+
+    def populate_bag_list(bag_count_map):
+        contained_directly = get_contained_directly(bag_count_map.items())
 
         if len(contained_directly) > 0:
-            complete_bag_list.append(contained_directly)
+            complete_list.extend(contained_directly)
 
         if len(contained_directly) > 0:
-            for bag_counts in contained_directly:
-                populate_bag_list(bag_counts)
+            for bag_count_direct_map in contained_directly:
+                populate_bag_list(bag_count_direct_map)
 
     bag_map = get_bag_map(read_lines())
-    complete_bag_list = []
+    complete_list = []
     populate_bag_list({'shinygold': 1})
-
-    flat_list = []
-
-    for thing in complete_bag_list:
-        flat_list.extend(thing)
-
-    final_map = {}
-
-    for this_map in flat_list:
-        for key in this_map.keys():
-            if key in final_map.keys():
-                final_map[key] = int(final_map.get(key)) + int(this_map.get(key))
-            else:
-                final_map[key] = int(this_map.get(key))
-
-    return sum(final_map.values())
+    return sum(chain.from_iterable(map(lambda this_map: list(this_map.values()), complete_list)))
 
 
 print(part1())
