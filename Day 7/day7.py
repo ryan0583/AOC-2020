@@ -25,7 +25,7 @@ def get_bag_map(lines):
 
 def part1():
     def bags_containing_bag_colour(bag_colour):
-        return filter(lambda key: bag_colour in bag_map.get(key), bag_map.keys())
+        return {key for key in bag_map.keys() if bag_colour in bag_map.get(key)}
 
     def populate_bag_list(bag_list):
         if len(bag_list) == 0:
@@ -69,7 +69,7 @@ def part2():
     bag_map = get_bag_map(read_lines())
     complete_list = []
     populate_bag_list({'shinygold': 1})
-    return sum(chain.from_iterable(map(lambda this_map: list(this_map.values()), complete_list)))
+    return sum(chain.from_iterable({this_map.values() for this_map in complete_list}))
 
 
 print(part1())
