@@ -41,20 +41,20 @@ def part1():
     return len(unique_complete_bag_list)
 
 
-def bags_within_bag_colour(bag_map: dict, bag_colour):
+def bags_within_bag_colour(bag_map: dict, bag_colour, multiplier):
     bag_list = {}
     if bag_colour in bag_map.keys():
         for bag in bag_map.get(bag_colour).split(','):
             if bag != 'noother':
-                bag_list[bag[1:len(bag)]] = bag[0]
+                bag_list[bag[1:len(bag)]] = int(bag[0]) * multiplier
     return bag_list
 
 
 def part2():
-    def populate_bag_list(bags_to_check):
+    def populate_bag_list(bag_map_to_chack):
         contained_directly = []
-        for bag in bags_to_check:
-            bags_within = bags_within_bag_colour(bag_map, bag)
+        for bag in bag_map_to_chack.keys():
+            bags_within = bags_within_bag_colour(bag_map, bag, bag_map_to_chack.get(bag))
             if len(bags_within) > 0:
                 contained_directly.append(bags_within)
 
@@ -63,11 +63,11 @@ def part2():
 
         if len(contained_directly) > 0:
             for bag_counts in contained_directly:
-                populate_bag_list(bag_counts.keys())
+                populate_bag_list(bag_counts)
 
     bag_map = get_bag_map(read_lines())
     complete_bag_list = []
-    populate_bag_list(['shinygold'])
+    populate_bag_list({'shinygold': 1})
 
     flat_list = []
 
@@ -84,9 +84,9 @@ def part2():
                 final_map[key] = int(this_map.get(key))
 
     print(final_map)
-    print(sum(final_map.values()))
+    return sum(final_map.values())
 
 
 # print(part1())
 
-part2()
+print(part2())
