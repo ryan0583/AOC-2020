@@ -43,28 +43,25 @@ def replace(lines, thing_to_replace, find, replace):
     return False
 
 
-def part2():
-    jmp_to_replace = 1
-    replaced_jmp = True
-    while replaced_jmp:
+def try_replacements(find_str, replace_str):
+    thing_to_replace = 1
+    replaced = True
+    while replaced:
         lines = read_lines()
-        replaced_jmp = replace(lines, jmp_to_replace, 'jmp', 'nop')
-        if replaced_jmp:
+        replaced = replace(lines, thing_to_replace, find_str, replace_str)
+        if replaced:
             result = parse_line(lines, 0, 0, {0})
             if result[0] == 0:
                 return result[1]
-        jmp_to_replace += 1
+        thing_to_replace += 1
+    return False
 
-    nop_to_replace = 1
-    replaced_nop = True
-    while replaced_nop:
-        lines = read_lines()
-        replaced_nop = replace(lines, nop_to_replace, 'jmp', 'nop')
-        if replaced_jmp:
-            result = parse_line(lines, 0, 0, {0})
-            if result[0] == 0:
-                return result[1]
-        nop_to_replace += 1
+
+def part2():
+    result = try_replacements('jmp', 'nop')
+    if not result:
+        result = try_replacements('nop', 'jmp')
+    return result
 
 
 print(part1())
