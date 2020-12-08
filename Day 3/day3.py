@@ -50,8 +50,8 @@ DEBUG = False
 parser = FileParser('Input.txt')
 tree_points = parser.read_points(TREE_CHAR)
 
-max_x = max(list(map(lambda point: point.get_x(), tree_points))) + 1
-max_y = max(list(map(lambda point: point.get_y(), tree_points))) + 1
+max_x = max([point.x for point in tree_points]) + 1
+max_y = max([point.y for point in tree_points]) + 1
 
 print(part1())
 print(part2())

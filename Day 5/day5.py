@@ -10,7 +10,7 @@ def get_seat_id(line: str) -> int:
 
 
 def get_seat_ids() -> list:
-    return list(map(lambda line: get_seat_id(line), read_lines()))
+    return [get_seat_id(line) for line in read_lines('Input.txt')]
 
 
 def part1() -> int:
@@ -35,10 +35,10 @@ def visualise(seat_ids: list, your_seat: int):
         graphics_panel.paint_canvas()
         time.sleep(0.005)
 
-    points = list(map(convert_seat_id_to_point, seat_ids))
+    points = [convert_seat_id_to_point(seat_id) for seat_id in seat_ids]
 
-    graphics_panel = GraphicsPanel.create_empty_panel(max(list(map(lambda point: point.x, points))) + 4,
-                                                      max(list(map(lambda point: point.y, points))) + 4,
+    graphics_panel = GraphicsPanel.create_empty_panel(max([point.x for point in points]) + 4,
+                                                      max([point.y for point in points]) + 4,
                                                       10)
 
     graphics_panel.init_canvas()
@@ -52,12 +52,10 @@ def visualise(seat_ids: list, your_seat: int):
 
 def part2() -> int:
     seat_ids = get_seat_ids()
-    your_seat = list(filter(lambda seat_id: seat_id not in seat_ids, list(range(min(seat_ids), max(seat_ids))))).pop()
+    your_seat = [seat_id for seat_id in list(range(min(seat_ids), max(seat_ids))) if seat_id not in seat_ids].pop()
     visualise(seat_ids, your_seat)
     return your_seat
 
 
-if __name__ == '__main__':
-    print(part1())
-    print(part2())
-    input("Press any key...")
+print(part1())
+print(part2())

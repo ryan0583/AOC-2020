@@ -42,8 +42,8 @@ class GraphicsPanel:
         self.root.update()
 
     def init_canvas(self):
-        x_dimension = (max(list(map(lambda position: position.x, self.tiles.keys()))) + 1) * self.scale
-        y_dimension = (max(list(map(lambda position: position.y, self.tiles.keys()))) + 1) * self.scale
+        x_dimension = (max([position.x for position in self.tiles.keys()]) + 1) * self.scale
+        y_dimension = (max([position.x for position in self.tiles.keys()]) + 1) * self.scale
 
         self.canvas = tk.Canvas(self.root, width=x_dimension, height=y_dimension)
         self.canvas.pack()

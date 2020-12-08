@@ -8,15 +8,15 @@ def remainder_in_list(number, lines):
 
 
 def part1():
-    lines = {int(line) for line in read_lines()}
-    match = {number for number in lines if remainder_in_list(number, lines)}.pop()
+    lines = [int(line) for line in read_lines('Input.txt')]
+    match = [number for number in lines if remainder_in_list(number, lines)].pop()
     return match * (2020 - match)
 
 
 def part2():
-    lines = {int(line) for line in read_lines()}
+    lines = [int(line) for line in read_lines('Input.txt')]
     combos = list(combinations(lines, 2))
-    pair = {pair for pair in combos if remainder_in_list(pair[0] + pair[1], lines)}.pop()
+    pair = [pair for pair in combos if remainder_in_list(pair[0] + pair[1], lines)].pop()
     return pair[0] * pair[1] * (2020 - pair[0] - pair[1])
 
 
