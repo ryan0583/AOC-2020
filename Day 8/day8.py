@@ -10,7 +10,8 @@ def try_replacements(find_str, replace_str):
     replaced = True
     while replaced:
         file_parser = FileParser('Input.txt')
-        if file_parser.replace(find_str, replace_str, occurrence_to_replace):
+        replaced = file_parser.replace(find_str, replace_str, occurrence_to_replace)
+        if replaced:
             result = file_parser.parse_boot_code()
             if result[0] == 0:
                 return result[1]

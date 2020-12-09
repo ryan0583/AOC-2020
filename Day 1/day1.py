@@ -16,6 +16,7 @@ def part1():
 def part2():
     lines = [int(line) for line in read_lines('Input.txt')]
     combos = list(combinations(lines, 2))
+    print(combos)
     pair = [pair for pair in combos if remainder_in_list(pair[0] + pair[1], lines)].pop()
     return pair[0] * pair[1] * (2020 - pair[0] - pair[1])
 
