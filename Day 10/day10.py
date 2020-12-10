@@ -27,29 +27,21 @@ def part1():
 
 def part2():
     def get_prev(number):
-        prev_list = []
-        for line in lines:
-            if line >= number:
-                return prev_list
-            if line >= number - 3:
-                prev_list.append(line)
-        return prev_list
+        return [line for line in lines if line >= number - 3 and not line >= number]
 
-    def process_next(number):
-        valid_prev_list = get_prev(number)
-        for valid_prev in valid_prev_list:
-            path_counts[number] += path_counts[valid_prev]
+    def process_next():
+        number = lines[index]
+        path_counts[number] = 0
+        for prev in get_prev(number):
+            path_counts[number] += path_counts[prev]
 
     lines = [int(row) for row in file_reader.read_lines('Input.txt')]
     lines.append(0)
     lines.sort()
     path_counts = {0: 1}
-    index = 1
-    while index < len(lines):
-        next_number = lines[index]
-        path_counts[next_number] = 0
-        process_next(next_number)
-        index += 1
+    for index in range(1, len(lines)):
+        process_next()
+
     return path_counts[max(lines)]
 
 
