@@ -7,7 +7,7 @@ def check_next(next_index, countback, lines):
     next_number = lines[next_index]
     sub_lines = lines[next_index - countback: next_index]
     combos = list(combinations(sub_lines, 2))
-    sums = {combo[0] + combo[1] for combo in combos}
+    sums = {sum(combo) for combo in combos}
     if next_number in sums:
         return -1
     return next_number
