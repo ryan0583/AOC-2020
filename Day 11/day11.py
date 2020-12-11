@@ -19,6 +19,49 @@ def get_adjacent(point, other_points):
     return adjacent
 
 
+def get_visible(point, other_points):
+    def append(filtered_list):
+        if len(filtered_list):
+            visible.append(min(filtered_list))
+
+    visible = []
+    other_points = [other_point for other_point in other_points if other_point != point]
+    horizontal = [horiz for horiz in other_points if horiz.y == point.y]
+    vertical = [vert for vert in other_points if vert.x == vert.x]
+    diagonal_r = [diag_r for diag_r in other_points if
+                  (diag_r.x - point.x) != 0 and (diag_r.y - point.y) / (diag_r.x - point.x) == 1]
+    diagonal_l = [diag_l for diag_l in other_points if
+                  (diag_l.x - point.x) != 0 and (diag_l.y - point.y) / (diag_l.x - point.x) == -1]
+
+    append([next_point.x - point.x for next_point in horizontal if next_point.x - point.x > 0])
+    append([point.x - next_point.x for next_point in horizontal if point.x - next_point.x > 0])
+
+    append([next_point.y - point.y for next_point in vertical if next_point.y - point.y > 0])
+    append([point.y - next_point.y for next_point in vertical if point.y - next_point.y > 0])
+
+    append([(next_point.x - point.x) + (next_point.y - point.y)
+            for next_point in diagonal_r
+            if next_point.x - point.x > 0
+            and next_point.y - point.y > 0])
+
+    append([(point.x - next_point.x) + (point.y - next_point.y)
+            for next_point in diagonal_r
+            if point.x - next_point.x > 0
+            and point.y - next_point.y > 0])
+
+    append([(point.x - next_point.x) + (next_point.y - point.y)
+            for next_point in diagonal_l
+            if point.x - next_point.x > 0
+            and next_point.y - point.y > 0])
+
+    append([(next_point.x - point.x) + (point.y - next_point.y)
+            for next_point in diagonal_l
+            if next_point.x - point.x > 0
+            and point.y - next_point.y > 0])
+
+    return set(visible)
+
+
 def part1():
     def get_permanent():
         permanent = []
@@ -58,4 +101,35 @@ def part1():
     return len(current_occupied)
 
 
-print(part1())
+def part2():
+    def next_round():
+        new = []
+        for seat in seats:
+            visible = get_visible(seat, seats)
+            print_points(visible)
+            visible_occupied = set.intersection(visible, current_occupied)
+            if seat not in current_occupied and len(visible_occupied) == 0:
+                new.append(seat)
+            elif seat in current_occupied and len(visible_occupied) < 5:
+                new.append(seat)
+
+        return set(new)
+
+    parser = FileParser("TestInput.txt")
+    seats = set(parser.read_points('L'))
+
+    current_occupied = set(seats)
+
+    while True:
+        print('...................')
+        new_occupied = next_round()
+        if new_occupied == current_occupied:
+            break
+        else:
+            current_occupied = new_occupied
+
+    return len(current_occupied)
+
+
+# print(part1())
+print(part2())
