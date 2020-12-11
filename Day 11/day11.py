@@ -20,44 +20,45 @@ def get_adjacent(point, other_points):
 
 
 def get_visible(point, other_points):
-    def append(filtered_list):
-        if len(filtered_list):
-            visible.append(min(filtered_list))
+    def append(distance_point_map):
+        if len(distance_point_map) > 0:
+            visible.append(distance_point_map[min(distance_point_map.keys())])
 
     visible = []
     other_points = [other_point for other_point in other_points if other_point != point]
+
     horizontal = [horiz for horiz in other_points if horiz.y == point.y]
-    vertical = [vert for vert in other_points if vert.x == vert.x]
+    vertical = [vert for vert in other_points if vert.x == point.x]
     diagonal_r = [diag_r for diag_r in other_points if
-                  (diag_r.x - point.x) != 0 and (diag_r.y - point.y) / (diag_r.x - point.x) == 1]
+                  (diag_r.x - point.x) != 0 and float(float(diag_r.y - point.y) / float(diag_r.x - point.x)) == 1]
     diagonal_l = [diag_l for diag_l in other_points if
-                  (diag_l.x - point.x) != 0 and (diag_l.y - point.y) / (diag_l.x - point.x) == -1]
+                  (diag_l.x - point.x) != 0 and float(float(diag_l.y - point.y) / float(diag_l.x - point.x)) == -1]
 
-    append([next_point.x - point.x for next_point in horizontal if next_point.x - point.x > 0])
-    append([point.x - next_point.x for next_point in horizontal if point.x - next_point.x > 0])
+    append({next_point.x - point.x: next_point for next_point in horizontal if next_point.x - point.x > 0})
+    append({point.x - next_point.x: next_point for next_point in horizontal if point.x - next_point.x > 0})
 
-    append([next_point.y - point.y for next_point in vertical if next_point.y - point.y > 0])
-    append([point.y - next_point.y for next_point in vertical if point.y - next_point.y > 0])
+    append({next_point.y - point.y: next_point for next_point in vertical if next_point.y - point.y > 0})
+    append({point.y - next_point.y: next_point for next_point in vertical if point.y - next_point.y > 0})
 
-    append([(next_point.x - point.x) + (next_point.y - point.y)
+    append({(next_point.x - point.x) + (next_point.y - point.y): next_point
             for next_point in diagonal_r
             if next_point.x - point.x > 0
-            and next_point.y - point.y > 0])
+            and next_point.y - point.y > 0})
 
-    append([(point.x - next_point.x) + (point.y - next_point.y)
+    append({(point.x - next_point.x) + (point.y - next_point.y): next_point
             for next_point in diagonal_r
             if point.x - next_point.x > 0
-            and point.y - next_point.y > 0])
+            and point.y - next_point.y > 0})
 
-    append([(point.x - next_point.x) + (next_point.y - point.y)
+    append({(point.x - next_point.x) + (next_point.y - point.y): next_point
             for next_point in diagonal_l
             if point.x - next_point.x > 0
-            and next_point.y - point.y > 0])
+            and next_point.y - point.y > 0})
 
-    append([(next_point.x - point.x) + (point.y - next_point.y)
+    append({(next_point.x - point.x) + (point.y - next_point.y): next_point
             for next_point in diagonal_l
             if next_point.x - point.x > 0
-            and point.y - next_point.y > 0])
+            and point.y - next_point.y > 0})
 
     return set(visible)
 
@@ -102,12 +103,13 @@ def part1():
 
 
 def part2():
+    def get_visible_map():
+        return {seat: get_visible(seat, seats) for seat in seats}
+
     def next_round():
         new = []
         for seat in seats:
-            visible = get_visible(seat, seats)
-            print_points(visible)
-            visible_occupied = set.intersection(visible, current_occupied)
+            visible_occupied = set.intersection(visible[seat], current_occupied)
             if seat not in current_occupied and len(visible_occupied) == 0:
                 new.append(seat)
             elif seat in current_occupied and len(visible_occupied) < 5:
@@ -115,13 +117,13 @@ def part2():
 
         return set(new)
 
-    parser = FileParser("TestInput.txt")
+    parser = FileParser("Input.txt")
     seats = set(parser.read_points('L'))
 
+    visible = get_visible_map()
     current_occupied = set(seats)
 
     while True:
-        print('...................')
         new_occupied = next_round()
         if new_occupied == current_occupied:
             break
@@ -131,5 +133,5 @@ def part2():
     return len(current_occupied)
 
 
-# print(part1())
+print(part1())
 print(part2())
