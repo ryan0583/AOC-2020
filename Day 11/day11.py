@@ -2,11 +2,6 @@ from Utils.file_parser import FileParser
 from Utils.point import Point
 
 
-def print_points(points):
-    for point in points:
-        print(point)
-
-
 def get_adjacent(point, other_points):
     adjacent = []
     for x in range(point.x - 1, point.x + 2):
@@ -16,52 +11,32 @@ def get_adjacent(point, other_points):
                 continue
             if point_to_check in other_points:
                 adjacent.append(point_to_check)
-    return adjacent
+    return set(adjacent)
 
 
 def part1():
-    def get_adjacent_map():
-        return {seat: get_adjacent(seat, seats) for seat in seats}
-
-    def get_permanent():
-        permanent = []
-        for seat in seats:
-            if len(adjacent_map[seat]) < 4:
-                permanent.append(seat)
-        return set(permanent)
-
     def next_round():
-        new = []
-        for seat in seats:
-            if seat in permanently_occupied:
-                new.append(seat)
+        def get_occupied_adjacent_length(seat):
+            return len(current_occupied.intersection(adjacent_map[seat]))
 
-            adjacent_occupied = set.intersection(current_occupied, adjacent_map[seat])
-            if seat not in current_occupied and len(adjacent_occupied) == 0:
-                new.append(seat)
-            elif seat in current_occupied and len(adjacent_occupied) < 4:
-                new.append(seat)
-
-        return set(new)
+        return [seat
+                for seat in seats
+                if (seat not in current_occupied and get_occupied_adjacent_length(seat) == 0)
+                or (seat in current_occupied and get_occupied_adjacent_length(seat) < 4)]
 
     parser = FileParser("Input.txt")
     seats = set(parser.read_points('L'))
 
-    adjacent_map = get_adjacent_map()
-    permanently_occupied = get_permanent()
+    adjacent_map = {seat: get_adjacent(seat, seats) for seat in seats}
     current_occupied = set(seats)
 
-    round = 1
     while True:
-        print(round)
-        new_occupied = next_round()
+        new_occupied = set(next_round())
         if new_occupied == current_occupied:
             break
         else:
             current_occupied = new_occupied
-        round += 1
 
-    print("====================")
     return len(current_occupied)
 
 
@@ -126,15 +101,16 @@ def part2():
         process_right_diagonal()
 
     def next_round():
-        new = []
-        for seat in seats:
-            visible_occupied = set.intersection(current_occupied, visible[seat])
-            if seat not in current_occupied and len(visible_occupied) == 0:
-                new.append(seat)
-            elif seat in current_occupied and len(visible_occupied) < 5:
-                new.append(seat)
+        def occupied(seat):
+            return seat in current_occupied
 
-        return set(new)
+        def get_occupied_visible_length(seat):
+            return len(current_occupied.intersection(visible[seat]))
+
+        return {seat
+                for seat in seats
+                if (not occupied(seat) and get_occupied_visible_length(seat) == 0)
+                or (occupied(seat) and get_occupied_visible_length(seat) < 5)}
 
     parser = FileParser("Input.txt")
     seats = set(parser.read_points('L'))
@@ -145,25 +121,15 @@ def part2():
     populate_visibles()
     current_occupied = set(seats)
 
-    round = 1
     while True:
-        print(round)
         new_occupied = next_round()
         if new_occupied == current_occupied:
             break
         else:
             current_occupied = new_occupied
-        round += 1
 
     return len(current_occupied)
 
 
-def test():
-    parser = FileParser("TestInput2.txt")
-    seats = set(parser.read_points('L'))
-    print_points(get_visible(Point(2, 1), seats))
-
-
 print(part1())
 print(part2())
-# test()
