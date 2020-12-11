@@ -19,55 +19,14 @@ def get_adjacent(point, other_points):
     return adjacent
 
 
-def get_visible(point, other_points):
-    def append(distance_point_map):
-        if len(distance_point_map) > 0:
-            visible.append(distance_point_map[min(distance_point_map.keys())])
-
-    visible = []
-    other_points = [other_point for other_point in other_points if other_point != point]
-
-    horizontal = [horiz for horiz in other_points if horiz.y == point.y]
-    vertical = [vert for vert in other_points if vert.x == point.x]
-    diagonal_r = [diag_r for diag_r in other_points if
-                  (diag_r.x - point.x) != 0 and float(float(diag_r.y - point.y) / float(diag_r.x - point.x)) == 1]
-    diagonal_l = [diag_l for diag_l in other_points if
-                  (diag_l.x - point.x) != 0 and float(float(diag_l.y - point.y) / float(diag_l.x - point.x)) == -1]
-
-    append({next_point.x - point.x: next_point for next_point in horizontal if next_point.x - point.x > 0})
-    append({point.x - next_point.x: next_point for next_point in horizontal if point.x - next_point.x > 0})
-
-    append({next_point.y - point.y: next_point for next_point in vertical if next_point.y - point.y > 0})
-    append({point.y - next_point.y: next_point for next_point in vertical if point.y - next_point.y > 0})
-
-    append({(next_point.x - point.x) + (next_point.y - point.y): next_point
-            for next_point in diagonal_r
-            if next_point.x - point.x > 0
-            and next_point.y - point.y > 0})
-
-    append({(point.x - next_point.x) + (point.y - next_point.y): next_point
-            for next_point in diagonal_r
-            if point.x - next_point.x > 0
-            and point.y - next_point.y > 0})
-
-    append({(point.x - next_point.x) + (next_point.y - point.y): next_point
-            for next_point in diagonal_l
-            if point.x - next_point.x > 0
-            and next_point.y - point.y > 0})
-
-    append({(next_point.x - point.x) + (point.y - next_point.y): next_point
-            for next_point in diagonal_l
-            if next_point.x - point.x > 0
-            and point.y - next_point.y > 0})
-
-    return set(visible)
-
-
 def part1():
+    def get_adjacent_map():
+        return {seat: get_adjacent(seat, seats) for seat in seats}
+
     def get_permanent():
         permanent = []
         for seat in seats:
-            if len(get_adjacent(seat, seats)) < 4:
+            if len(adjacent_map[seat]) < 4:
                 permanent.append(seat)
         return set(permanent)
 
@@ -77,10 +36,10 @@ def part1():
             if seat in permanently_occupied:
                 new.append(seat)
 
-            adjacent = get_adjacent(seat, current_occupied)
-            if seat not in current_occupied and len(adjacent) == 0:
+            adjacent_occupied = set.intersection(current_occupied, adjacent_map[seat])
+            if seat not in current_occupied and len(adjacent_occupied) == 0:
                 new.append(seat)
-            elif seat in current_occupied and len(adjacent) < 4:
+            elif seat in current_occupied and len(adjacent_occupied) < 4:
                 new.append(seat)
 
         return set(new)
@@ -88,28 +47,88 @@ def part1():
     parser = FileParser("Input.txt")
     seats = set(parser.read_points('L'))
 
+    adjacent_map = get_adjacent_map()
     permanently_occupied = get_permanent()
     current_occupied = set(seats)
 
+    round = 1
     while True:
-        print('...................')
+        print(round)
         new_occupied = next_round()
         if new_occupied == current_occupied:
             break
         else:
             current_occupied = new_occupied
+        round += 1
 
+    print("====================")
     return len(current_occupied)
 
 
 def part2():
-    def get_visible_map():
-        return {seat: get_visible(seat, seats) for seat in seats}
+    def populate_visibles():
+        def process(next_seat, x, y):
+            this_point = Point(x, y)
+            if this_point in seats:
+                if next_seat is None:
+                    return this_point
+                else:
+                    visible[next_seat].add(this_point)
+                    visible[this_point].add(next_seat)
+                    return this_point
+            return next_seat
+
+        def process_vertical():
+            for y in range(0, xdim):
+                next_seat = None
+                for x in range(0, xdim):
+                    next_seat = process(next_seat, x, y)
+
+        def process_horizontal():
+            for x in range(0, xdim):
+                next_seat = None
+                for y in range(0, ydim):
+                    next_seat = process(next_seat, x, y)
+
+        def process_right_diagonal():
+            start_x = xdim - 1
+            x = start_x
+            y = 0
+            next_seat = None
+            while start_x != -ydim:
+                next_seat = process(next_seat, x, y)
+                x += 1
+                y += 1
+                if x == xdim:
+                    next_seat = None
+                    start_x -= 1
+                    x = start_x
+                    y = 0
+
+        def process_left_diagonal():
+            start_x = 0
+            x = start_x
+            y = 0
+            next_seat = None
+            while start_x != xdim + ydim:
+                next_seat = process(next_seat, x, y)
+                x -= 1
+                y += 1
+                if x == -1:
+                    next_seat = None
+                    start_x += 1
+                    x = start_x
+                    y = 0
+
+        process_horizontal()
+        process_vertical()
+        process_left_diagonal()
+        process_right_diagonal()
 
     def next_round():
         new = []
         for seat in seats:
-            visible_occupied = set.intersection(visible[seat], current_occupied)
+            visible_occupied = set.intersection(current_occupied, visible[seat])
             if seat not in current_occupied and len(visible_occupied) == 0:
                 new.append(seat)
             elif seat in current_occupied and len(visible_occupied) < 5:
@@ -119,19 +138,32 @@ def part2():
 
     parser = FileParser("Input.txt")
     seats = set(parser.read_points('L'))
+    xdim = max([seat.x for seat in seats]) + 1
+    ydim = max([seat.y for seat in seats]) + 1
 
-    visible = get_visible_map()
+    visible = {seat: set() for seat in seats}
+    populate_visibles()
     current_occupied = set(seats)
 
+    round = 1
     while True:
+        print(round)
         new_occupied = next_round()
         if new_occupied == current_occupied:
             break
         else:
             current_occupied = new_occupied
+        round += 1
 
     return len(current_occupied)
 
 
+def test():
+    parser = FileParser("TestInput2.txt")
+    seats = set(parser.read_points('L'))
+    print_points(get_visible(Point(2, 1), seats))
+
+
 print(part1())
 print(part2())
+# test()
