@@ -70,9 +70,6 @@ def part2():
     ship_position = Point(START_POSITION.x, START_POSITION.y)
     waypoint_position = Point(START_POSITION.x + waypoint_relative.x, START_POSITION.y + waypoint_relative.y)
     lines = read_lines("Input.txt")
-    print(f'SHIP: {ship_position}')
-    print(f'WAYPOINT: {waypoint_position}')
-    print('====================')
     for line in lines:
         instruction = line[0]
         amount = int(line[1:])
@@ -85,14 +82,9 @@ def part2():
             waypoint_position = move(waypoint_position, DIRECTIONS.index(instruction), amount)
             waypoint_relative = Point(waypoint_position.x - ship_position.x, waypoint_position.y - ship_position.y)
         else:
-
             for i in range(0, amount):
                 ship_position = Point(waypoint_position.x, waypoint_position.y)
                 waypoint_position = Point(ship_position.x + waypoint_relative.x, ship_position.y + waypoint_relative.y)
-
-        print(f'SHIP: {ship_position}')
-        print(f'WAYPOINT: {waypoint_position}')
-        print('====================')
 
     return abs(ship_position.x) + abs(ship_position.y)
 
@@ -109,5 +101,5 @@ DIRECTIONS = ["N", "E", "S", "W"]
 
 START_POSITION = Point(0, 0)
 
-# print(part1())
+print(part1())
 print(part2())
