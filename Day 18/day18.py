@@ -1,41 +1,38 @@
 from Utils.file_reader import read_lines
 
 
-def calc_sum(input):
+def calc_sum(input, print_total):
     def process_brackets(index):
         sub = input[index:]
-        close_index = sub.index(")")
-        string_in_brackets = sub[0:close_index + 1]
-        # print(string_in_brackets)
-        bracket_sum = calc_sum(string_in_brackets)
-        # print(bracket_sum)
-        return [bracket_sum, close_index]
+        return calc_sum(sub, False)
 
     total = 0
     next_operator = ''
 
-    print('================')
-    print(input)
+    # print('================')
+    # print(input)
 
     i = 0
     while i < len(input):
         # print(i)
         char = input[i]
+        # print(char)
 
         i += 1
 
         if char == ')':
-
-            continue
+            return [total, i]
 
         if char == MULTIPLY or char == ADD:
             next_operator = char
         else:
             if char == '(':
+                if print_total:
+                    print("FOUND BRACKET, RECURSING")
                 result = process_brackets(i)
                 next_num = result[0]
                 i += result[1]
-                print("NEW i: " + str(i))
+                # print("NEW i: " + str(i))
             else:
                 next_num = int(char)
 
@@ -46,15 +43,18 @@ def calc_sum(input):
             elif next_operator == ADD:
                 total += next_num
 
-    print("TOTAL: " + str(total))
-    return total
+            if print_total:
+                print(total)
+
+    # print(total)
+    return [total, i]
 
 
 def part1():
     sum_str_lines = read_lines('Input.txt')
-    return sum([calc_sum(line.replace(' ', '').replace('\n', '')) for line in sum_str_lines])
+    return sum([calc_sum(line.replace(' ', '').replace('\n', ''), True)[0] for line in sum_str_lines])
 
 
 MULTIPLY = "*"
 ADD = "+"
-print(part1())
+print("sum of all results: " + str(part1()))
