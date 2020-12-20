@@ -1,6 +1,7 @@
 from Utils.file_reader import read_chunks
 from Utils.debug_tools import debug_print
 import math
+from pprint import pprint
 
 
 class Tile:
@@ -82,7 +83,7 @@ def populate_edge_matches(tile, other_tiles):
 
 
 def get_tiles():
-    chunks = read_chunks('Input.txt')
+    chunks = read_chunks('TestInput.txt')
 
     tiles = [Tile(int(tile[tile.index('Tile ') + 5:tile.index(':\n')]), tile[tile.index(':\n') + 2:].split('\n'))
              for tile in chunks]
@@ -100,26 +101,158 @@ def part1():
     print(math.prod(corner_indexes))
 
 
+def matches(this_tile, other_tile):
+    if other_tile is None:
+        return this_tile is None
+    elif this_tile is not None:
+        return other_tile.index == this_tile.index
+    return False
+
+
+def rotate_90(image):
+    return [''.join(row) for row in zip(*reversed(image))]
+
+
+def get_image_below_tile_and_right_tile(this_tile, above_tile):
+    def check_tile(image, top_match, right_match, bottom_match, left_match):
+        # Correctly oriented
+        if matches(top_match, above_tile) \
+                and left_match is None:
+            return [image, bottom_match]
+
+        # Flip horizontal
+        elif matches(top_match, above_tile) \
+                and right_match is None:
+            return [[row[::-1] for row in image], bottom_match]
+
+        # Flip vertical
+        elif matches(bottom_match, above_tile) \
+                and left_match is None:
+            return [image[::-1], top_match]
+
+        return None
+
+    # Correctly oriented
+    result = check_tile(this_tile.image, this_tile.top_match, this_tile.right_match, this_tile.bottom_match,
+                            this_tile.left_match)
+
+    if result is None:
+        # Rotate 90
+        result = check_tile(rotate_90(this_tile.image), this_tile.left_match, this_tile.top_match,
+                                this_tile.right_match,
+                                this_tile.bottom_match)
+
+    if result is None:
+        # Rotate 180
+        result = check_tile(rotate_90(rotate_90(this_tile.image)), this_tile.bottom_match,
+                                this_tile.left_match, this_tile.top_match,
+                                this_tile.right_match)
+
+    if result is None:
+        # Rotate 270
+        result = check_tile(rotate_90(rotate_90(rotate_90(this_tile.image))), this_tile.right_match,
+                                this_tile.bottom_match, this_tile.left_match,
+                                this_tile.top_match)
+
+    return result
+
+
+def generate_full_image(corners):
+    def get_row(start_tile, start_image, right_tile, above_row):
+        def check_image(image, top_match, right_match, bottom_match, left_match, left_tile, above_tile):
+            # Correctly oriented
+            if matches(left_match, left_tile) \
+                    and matches(top_match, above_tile):
+                image_row.append(image)
+                return right_match
+
+            # Flip horizontal
+            elif matches(right_match, left_tile) \
+                    and matches(top_match, above_tile):
+                image_row.append([row[::-1] for row in image])
+                return left_match
+
+            # Flip vertical
+            elif matches(left_match, left_tile) \
+                    and matches(bottom_match, above_tile):
+                image_row.append(image[::-1])
+                return right_match
+
+            return None
+
+        def add_tile(this_tile, left_tile, above_tile):
+
+            # Correctly oriented
+            next_tile = check_image(this_tile.image, this_tile.top_match, this_tile.right_match, this_tile.bottom_match,
+                                    this_tile.left_match, left_tile, above_tile)
+
+            if next_tile is None:
+                # Rotate 90
+                next_tile = check_image(rotate_90(this_tile.image), this_tile.left_match, this_tile.top_match,
+                                        this_tile.right_match,
+                                        this_tile.bottom_match, left_tile, above_tile)
+
+            if next_tile is None:
+                # Rotate 180
+                next_tile = check_image(rotate_90(rotate_90(this_tile.image)), this_tile.bottom_match,
+                                        this_tile.left_match, this_tile.top_match,
+                                        this_tile.right_match, left_tile, above_tile)
+
+            if next_tile is None:
+                # Rotate 270
+                next_tile = check_image(rotate_90(rotate_90(rotate_90(this_tile.image))), this_tile.right_match,
+                                        this_tile.bottom_match, this_tile.left_match,
+                                        this_tile.top_match, left_tile, above_tile)
+
+            return next_tile
+
+        image_row = [start_image]
+        new_above_row.append(start_tile)
+        last_tile = start_tile
+        index = 0
+        while right_tile is not None:
+            next_tile = add_tile(right_tile, last_tile, above_row[index] if len(above_row) > index else None)
+            new_above_row.append(next_tile)
+            last_tile = right_tile
+            right_tile = next_tile
+            index += 1
+        return image_row
+
+    start_corner = [corner for corner in corners if corner.right_match is not None and corner.bottom_match is not None][
+        0]
+
+    start_tile = start_corner
+    start_image = start_tile.image
+    right_tile = start_tile.right_match
+    below_tile = start_corner.bottom_match
+
+    complete_image = []
+
+    above_row = []
+    new_above_row = []
+
+    while below_tile is not None:
+        complete_image.append(get_row(start_tile, start_image, right_tile, above_row))
+        above_row = new_above_row
+        new_above_row = []
+        [start_image, below_tile] = get_below_tile_and_image(below_tile, start_tile)
+        start_tile = below_tile
+
+    for section in complete_image:
+        for i in range(1, len(section[0]) - 1):
+            line = ''
+            for row in section:
+                line += row[i][1:len(row) - 1]
+            print(line)
+
+
 def part2():
-    chunks = read_chunks('TestInput.txt')
+    tiles = get_tiles()
 
-    tiles = [Tile(int(tile[tile.index('Tile ') + 5:tile.index(':\n')]), tile[tile.index(':\n') + 2:]) for tile in
-             chunks]
+    corners = [tile for tile in tiles if tile.get_match_count() == 2]
 
-    tile_map = {tile.index: tile.image for tile in tiles}
-
-    corners = [tile for tile in tile_map.keys() if is_corner(tile, tile_map)]
-
-    print(corners)
-
-    sides = [tile for tile in tile_map.keys() if is_side(tile, tile_map)]
-
-    print(sides)
-
-    middle = [tile for tile in tile_map.keys() if tile not in sides and tile not in corners]
-
-    print(middle)
+    generate_full_image(corners)
 
 
-part1()
-# part2()
+# part1()
+part2()
