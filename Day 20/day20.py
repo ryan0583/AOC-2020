@@ -14,8 +14,7 @@ class Tile:
 
     def get_match_count(self):
         match_list = [self.top_match, self.right_match, self.bottom_match, self.left_match]
-        match_list.remove(None)
-        return len(match_list)
+        return len([match for match in match_list if match is not None])
 
 
 def edges_match(this_edge, other_edge):
@@ -43,10 +42,10 @@ def get_right_edge(tile):
 
 
 def check_match(edge, other_tile):
-    return edges_match(edge, get_top_row(other_tile)) \
-           or edges_match(edge, get_right_edge(other_tile)) \
-           or edges_match(edge, get_bottom_row(other_tile)) \
-           or edges_match(edge, get_left_edge(other_tile))
+    return edges_match(edge, get_top_row(other_tile.image)) \
+           or edges_match(edge, get_right_edge(other_tile.image)) \
+           or edges_match(edge, get_bottom_row(other_tile.image)) \
+           or edges_match(edge, get_left_edge(other_tile.image))
 
 
 def populate_edge_matches(tile, other_tiles):
@@ -67,32 +66,37 @@ def populate_edge_matches(tile, other_tiles):
         if not top_match:
             top_match = check_match(top_row, other_tile)
             if top_match:
-                tile_image.top_match = other_tile
+                tile.top_match = other_tile
         if not bottom_match:
             bottom_match = check_match(bottom_row, other_tile)
             if bottom_match:
-                tile_image.bottom_match = other_tile
+                tile.bottom_match = other_tile
         if not left_match:
             left_match = check_match(left_edge, other_tile)
             if left_match:
-                tile_image.left_match = other_tile
+                tile.left_match = other_tile
         if not right_match:
             right_match = check_match(right_edge, other_tile)
             if right_match:
-                tile_image.right_match = other_tile
+                tile.right_match = other_tile
 
 
-def part1():
+def get_tiles():
     chunks = read_chunks('Input.txt')
 
-    tiles = [Tile(int(tile[tile.index('Tile ') + 5:tile.index(':\n')]), tile[tile.index(':\n') + 2:]) for tile in
-             chunks]
+    tiles = [Tile(int(tile[tile.index('Tile ') + 5:tile.index(':\n')]), tile[tile.index(':\n') + 2:].split('\n'))
+             for tile in chunks]
 
     for tile in tiles:
         populate_edge_matches(tile, tiles)
 
-    corner_indexes = [tile.index for tile in tiles if tile.get_match_count() == 2]
+    return tiles
 
+
+def part1():
+    tiles = get_tiles()
+    corner_indexes = [tile.index for tile in tiles if tile.get_match_count() == 2]
+    print(corner_indexes)
     print(math.prod(corner_indexes))
 
 
