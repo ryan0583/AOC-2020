@@ -1,7 +1,6 @@
 import math
 
 from Utils.file_reader import read_chunks, read_lines
-from pprint import pprint
 
 
 class Tile:
@@ -97,8 +96,7 @@ def get_tiles():
 def part1():
     tiles = get_tiles()
     corner_indexes = [tile.index for tile in tiles if tile.get_match_count() == 2]
-    print(corner_indexes)
-    print(math.prod(corner_indexes))
+    return math.prod(corner_indexes)
 
 
 def matches(this_tile, other_tile):
@@ -113,6 +111,14 @@ def rotate_90(image):
     return [''.join(row) for row in zip(*reversed(image))]
 
 
+def flip_horizontal(image):
+    return [row[::-1] for row in image]
+
+
+def flip_vertical(image):
+    return image[::-1]
+
+
 def get_image_below_tile_and_right_tile(this_tile, above_tile):
     def check_tile(image, top_match, right_match, bottom_match, left_match):
         # Correctly oriented
@@ -123,12 +129,12 @@ def get_image_below_tile_and_right_tile(this_tile, above_tile):
         # Flip horizontal
         elif matches(top_match, above_tile) \
                 and right_match is None:
-            return [[row[::-1] for row in image], bottom_match, left_match]
+            return [flip_horizontal(image), bottom_match, left_match]
 
         # Flip vertical
         elif matches(bottom_match, above_tile) \
                 and left_match is None:
-            return [image[::-1], top_match, right_match]
+            return [flip_vertical(image), top_match, right_match]
 
         return None
 
@@ -169,13 +175,13 @@ def generate_full_image(corners):
             # Flip horizontal
             elif matches(right_match, left_tile) \
                     and matches(top_match, above_tile):
-                image_row.append([row[::-1] for row in image])
+                image_row.append(flip_horizontal(image))
                 return left_match
 
             # Flip vertical
             elif matches(left_match, left_tile) \
                     and matches(bottom_match, above_tile):
-                image_row.append(image[::-1])
+                image_row.append(flip_vertical(image))
                 return right_match
 
             return None
@@ -219,8 +225,10 @@ def generate_full_image(corners):
         new_above_row.append(last_tile)
         return image_row
 
-    start_corner = [corner for corner in corners if corner.right_match is not None and corner.bottom_match is not None][
-        0]
+    start_corner = [corner
+                    for corner in corners
+                    if corner.right_match is not None
+                    and corner.bottom_match is not None][0]
 
     start_tile = start_corner
     start_image = start_tile.image
@@ -237,12 +245,9 @@ def generate_full_image(corners):
         above_row = new_above_row
         if below_tile is not None:
             next_thing = get_image_below_tile_and_right_tile(below_tile, start_tile)
-            if next_thing is not None:
-                start_tile = below_tile
-                [start_image, below_tile, right_tile] = next_thing
-                new_above_row = []
-            else:
-                start_tile = None
+            start_tile = below_tile
+            [start_image, below_tile, right_tile] = next_thing
+            new_above_row = []
         else:
             start_tile = None
 
@@ -265,14 +270,15 @@ def get_seamonster_count(image, seamonster):
         for y in range(0, len(image) - len(seamonster)):
             is_seamonster = True
             subimage = [line[x: x + len(seamonster[0])] for line in image[y: y + len(seamonster)]]
-            print(subimage)
-            # pprint(subimage)
             for y_index, seamonster_line in enumerate(seamonster):
                 for x_index, seamonster_char in enumerate(seamonster_line):
                     if seamonster_char == '0':
                         continue
                     elif subimage[y_index][x_index] != seamonster_char:
                         is_seamonster = False
+                        break
+                if not is_seamonster:
+                    break
             if is_seamonster:
                 seamonster_count += 1
 
@@ -283,42 +289,31 @@ def part2():
     def get_all_flips_seamonster_count():
         seamonster_count = get_seamonster_count(image, seamonster)
         if seamonster_count == 0:
-            #Flip horizontal
-            seamonster_count = get_seamonster_count([[row[::-1] for row in image]], seamonster)
+            # Flip horizontal
+            seamonster_count = get_seamonster_count(flip_horizontal(image), seamonster)
         if seamonster_count == 0:
-            #Flip vertical
-            seamonster_count = get_seamonster_count(image[::-1], seamonster)
+            # Flip vertical
+            seamonster_count = get_seamonster_count(flip_vertical(image), seamonster)
 
         return seamonster_count
 
     tiles = get_tiles()
     seamonster = [line.replace('\n', '') for line in read_lines('Seamonster.txt')]
-    # print(seamonster)
 
     corners = [tile for tile in tiles if tile.get_match_count() == 2]
 
     image = generate_full_image(corners)
 
-    # pprint(image)
-
     seamonster_count = get_all_flips_seamonster_count()
-    if seamonster_count == 0:
-        image = rotate_90(image)
-        seamonster_count = get_all_flips_seamonster_count()
-    if seamonster_count == 0:
-        image = rotate_90(image)
-        seamonster_count = get_all_flips_seamonster_count()
-    if seamonster_count == 0:
+    while seamonster_count == 0:
         image = rotate_90(image)
         seamonster_count = get_all_flips_seamonster_count()
 
     seamonster_hash_count = len([char for char in ''.join(seamonster) if char == '#'])
-    print(seamonster_hash_count)
     total_hash_count = len([char for char in ''.join(image) if char == '#'])
-    print(total_hash_count)
     final_count = total_hash_count - (seamonster_hash_count * seamonster_count)
-    print(final_count)
+    return final_count
 
 
-# part1()
-part2()
+print(part1())
+print(part2())
