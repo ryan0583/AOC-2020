@@ -1,6 +1,6 @@
-from Utils.file_reader import read_chunks
-from Utils.debug_tools import debug_print
 import math
+
+from Utils.file_reader import read_chunks, read_lines
 from pprint import pprint
 
 
@@ -83,7 +83,7 @@ def populate_edge_matches(tile, other_tiles):
 
 
 def get_tiles():
-    chunks = read_chunks('TestInput.txt')
+    chunks = read_chunks('Input.txt')
 
     tiles = [Tile(int(tile[tile.index('Tile ') + 5:tile.index(':\n')]), tile[tile.index(':\n') + 2:].split('\n'))
              for tile in chunks]
@@ -246,20 +246,78 @@ def generate_full_image(corners):
         else:
             start_tile = None
 
+    final_image = []
+
     for section in complete_image:
         for i in range(1, len(section[0]) - 1):
             line = ''
             for row in section:
                 line += row[i][1:len(row) - 1]
-            print(line)
+            final_image.append(line)
+
+    return final_image
+
+
+def get_seamonster_count(image, seamonster):
+    seamonster_count = 0
+
+    for x in range(0, len(image[0]) - len(seamonster[0])):
+        for y in range(0, len(image) - len(seamonster)):
+            is_seamonster = True
+            subimage = [line[x: x + len(seamonster[0])] for line in image[y: y + len(seamonster)]]
+            print(subimage)
+            # pprint(subimage)
+            for y_index, seamonster_line in enumerate(seamonster):
+                for x_index, seamonster_char in enumerate(seamonster_line):
+                    if seamonster_char == '0':
+                        continue
+                    elif subimage[y_index][x_index] != seamonster_char:
+                        is_seamonster = False
+            if is_seamonster:
+                seamonster_count += 1
+
+    return seamonster_count
 
 
 def part2():
+    def get_all_flips_seamonster_count():
+        seamonster_count = get_seamonster_count(image, seamonster)
+        if seamonster_count == 0:
+            #Flip horizontal
+            seamonster_count = get_seamonster_count([[row[::-1] for row in image]], seamonster)
+        if seamonster_count == 0:
+            #Flip vertical
+            seamonster_count = get_seamonster_count(image[::-1], seamonster)
+
+        return seamonster_count
+
     tiles = get_tiles()
+    seamonster = [line.replace('\n', '') for line in read_lines('Seamonster.txt')]
+    # print(seamonster)
 
     corners = [tile for tile in tiles if tile.get_match_count() == 2]
 
-    generate_full_image(corners)
+    image = generate_full_image(corners)
+
+    # pprint(image)
+
+    seamonster_count = get_all_flips_seamonster_count()
+    if seamonster_count == 0:
+        image = rotate_90(image)
+        seamonster_count = get_all_flips_seamonster_count()
+    if seamonster_count == 0:
+        image = rotate_90(image)
+        seamonster_count = get_all_flips_seamonster_count()
+    if seamonster_count == 0:
+        image = rotate_90(image)
+        seamonster_count = get_all_flips_seamonster_count()
+
+    seamonster_hash_count = len([char for char in ''.join(seamonster) if char == '#'])
+    print(seamonster_hash_count)
+    total_hash_count = len([char for char in ''.join(image) if char == '#'])
+    print(total_hash_count)
+    final_count = total_hash_count - (seamonster_hash_count * seamonster_count)
+    print(final_count)
 
 
 # part1()
