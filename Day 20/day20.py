@@ -118,47 +118,47 @@ def get_image_below_tile_and_right_tile(this_tile, above_tile):
         # Correctly oriented
         if matches(top_match, above_tile) \
                 and left_match is None:
-            return [image, bottom_match]
+            return [image, bottom_match, right_match]
 
         # Flip horizontal
         elif matches(top_match, above_tile) \
                 and right_match is None:
-            return [[row[::-1] for row in image], bottom_match]
+            return [[row[::-1] for row in image], bottom_match, left_match]
 
         # Flip vertical
         elif matches(bottom_match, above_tile) \
                 and left_match is None:
-            return [image[::-1], top_match]
+            return [image[::-1], top_match, right_match]
 
         return None
 
     # Correctly oriented
     result = check_tile(this_tile.image, this_tile.top_match, this_tile.right_match, this_tile.bottom_match,
-                            this_tile.left_match)
+                        this_tile.left_match)
 
     if result is None:
         # Rotate 90
         result = check_tile(rotate_90(this_tile.image), this_tile.left_match, this_tile.top_match,
-                                this_tile.right_match,
-                                this_tile.bottom_match)
+                            this_tile.right_match,
+                            this_tile.bottom_match)
 
     if result is None:
         # Rotate 180
         result = check_tile(rotate_90(rotate_90(this_tile.image)), this_tile.bottom_match,
-                                this_tile.left_match, this_tile.top_match,
-                                this_tile.right_match)
+                            this_tile.left_match, this_tile.top_match,
+                            this_tile.right_match)
 
     if result is None:
         # Rotate 270
         result = check_tile(rotate_90(rotate_90(rotate_90(this_tile.image))), this_tile.right_match,
-                                this_tile.bottom_match, this_tile.left_match,
-                                this_tile.top_match)
+                            this_tile.bottom_match, this_tile.left_match,
+                            this_tile.top_match)
 
     return result
 
 
 def generate_full_image(corners):
-    def get_row(start_tile, start_image, right_tile, above_row):
+    def get_row(right_tile):
         def check_image(image, top_match, right_match, bottom_match, left_match, left_tile, above_tile):
             # Correctly oriented
             if matches(left_match, left_tile) \
@@ -181,24 +181,25 @@ def generate_full_image(corners):
             return None
 
         def add_tile(this_tile, left_tile, above_tile):
+            current_image_len = len(image_row)
 
             # Correctly oriented
             next_tile = check_image(this_tile.image, this_tile.top_match, this_tile.right_match, this_tile.bottom_match,
                                     this_tile.left_match, left_tile, above_tile)
 
-            if next_tile is None:
+            if len(image_row) == current_image_len:
                 # Rotate 90
                 next_tile = check_image(rotate_90(this_tile.image), this_tile.left_match, this_tile.top_match,
                                         this_tile.right_match,
                                         this_tile.bottom_match, left_tile, above_tile)
 
-            if next_tile is None:
+            if len(image_row) == current_image_len:
                 # Rotate 180
                 next_tile = check_image(rotate_90(rotate_90(this_tile.image)), this_tile.bottom_match,
                                         this_tile.left_match, this_tile.top_match,
                                         this_tile.right_match, left_tile, above_tile)
 
-            if next_tile is None:
+            if len(image_row) == current_image_len:
                 # Rotate 270
                 next_tile = check_image(rotate_90(rotate_90(rotate_90(this_tile.image))), this_tile.right_match,
                                         this_tile.bottom_match, this_tile.left_match,
@@ -207,15 +208,15 @@ def generate_full_image(corners):
             return next_tile
 
         image_row = [start_image]
-        new_above_row.append(start_tile)
         last_tile = start_tile
-        index = 0
+        index = 1
         while right_tile is not None:
+            new_above_row.append(last_tile)
             next_tile = add_tile(right_tile, last_tile, above_row[index] if len(above_row) > index else None)
-            new_above_row.append(next_tile)
             last_tile = right_tile
             right_tile = next_tile
             index += 1
+        new_above_row.append(last_tile)
         return image_row
 
     start_corner = [corner for corner in corners if corner.right_match is not None and corner.bottom_match is not None][
@@ -231,12 +232,19 @@ def generate_full_image(corners):
     above_row = []
     new_above_row = []
 
-    while below_tile is not None:
-        complete_image.append(get_row(start_tile, start_image, right_tile, above_row))
+    while start_tile is not None:
+        complete_image.append(get_row(right_tile))
         above_row = new_above_row
-        new_above_row = []
-        [start_image, below_tile] = get_below_tile_and_image(below_tile, start_tile)
-        start_tile = below_tile
+        if below_tile is not None:
+            next_thing = get_image_below_tile_and_right_tile(below_tile, start_tile)
+            if next_thing is not None:
+                start_tile = below_tile
+                [start_image, below_tile, right_tile] = next_thing
+                new_above_row = []
+            else:
+                start_tile = None
+        else:
+            start_tile = None
 
     for section in complete_image:
         for i in range(1, len(section[0]) - 1):
