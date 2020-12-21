@@ -1,6 +1,6 @@
 def read_lines(filename):
     file = open(filename, "r")
-    lines = [*file.readlines()]
+    lines = [*[line.replace('\n', '') for line in file.readlines()]]
     file.close()
     return lines
 
