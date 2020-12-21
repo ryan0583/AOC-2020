@@ -108,7 +108,7 @@ def matches(this_tile, other_tile):
 
 
 def rotate_90(image):
-    return [''.join(row) for row in zip(*reversed(image))]
+    return [''.join(row) for row in zip(*image[::-1])]
 
 
 def flip_horizontal(image):
@@ -298,7 +298,7 @@ def part2():
         return seamonster_count
 
     tiles = get_tiles()
-    seamonster = [line.replace('\n', '') for line in read_lines('Seamonster.txt')]
+    seamonster = read_lines('Seamonster.txt')
 
     corners = [tile for tile in tiles if tile.get_match_count() == 2]
 

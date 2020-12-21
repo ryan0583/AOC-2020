@@ -3,7 +3,7 @@ import itertools
 from Utils.file_reader import read_lines
 
 
-def part1():
+def get_all_ingredients_and_allergen_map():
     lines = read_lines('Input.txt')
 
     allergen_to_ingredient = {}
@@ -22,13 +22,15 @@ def part1():
             else:
                 allergen_to_ingredient[allergen] = ingredient_set
 
-    print(allergen_to_ingredient)
-    print(all_ingredients)
+    return [all_ingredients, allergen_to_ingredient]
+
+
+def part1():
+    [all_ingredients, allergen_to_ingredient] = get_all_ingredients_and_allergen_map()
+
     allergen_ingredients = list(itertools.chain(*[ingredients for ingredients in allergen_to_ingredient.values()]))
-    print(allergen_ingredients)
 
     no_allergen_list = [ingredient for ingredient in all_ingredients if ingredient not in allergen_ingredients]
-    print(no_allergen_list)
 
     count_map = {}
     for ingredient in no_allergen_list:
@@ -37,7 +39,25 @@ def part1():
         else:
             count_map[ingredient] = 1
 
-    print(sum(count_map.values()))
+    return sum(count_map.values())
 
 
-part1()
+def part2():
+    allergen_to_ingredient = get_all_ingredients_and_allergen_map()[1]
+
+    while len([ingredients for ingredients in allergen_to_ingredient.values() if len(ingredients) > 1]) > 0:
+        for key in allergen_to_ingredient.keys():
+            if len(allergen_to_ingredient[key]) == 1:
+                ingredient_to_remove = list(allergen_to_ingredient[key])[0]
+                for other_key in allergen_to_ingredient.keys():
+                    if other_key != key and ingredient_to_remove in allergen_to_ingredient[other_key]:
+                        allergen_to_ingredient[other_key].remove(ingredient_to_remove)
+
+    allergen_list = list(allergen_to_ingredient.keys())
+    allergen_list.sort()
+
+    return ','.join([list(allergen_to_ingredient[allergen])[0] for allergen in allergen_list])
+
+
+print(part1())
+print(part2())
