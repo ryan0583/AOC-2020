@@ -41,14 +41,14 @@ def part1():
 
 def part2_game(player1_cards, player2_cards, game_number):
     def play_round():
-        player1_top_card = player1_cards.pop(0)
-        player2_top_card = player2_cards.pop(0)
-
-        this_round_cards = (player1_top_card, player2_top_card)
+        this_round_cards = (tuple(player1_cards), tuple(player2_cards))
         if this_round_cards in previous_rounds_cards:
             return 1
         else:
             previous_rounds_cards.add(this_round_cards)
+
+        player1_top_card = player1_cards.pop(0)
+        player2_top_card = player2_cards.pop(0)
 
         if len(player1_cards) < player1_top_card or len(player2_cards) < player2_top_card:
             if player1_top_card > player2_top_card:
@@ -56,7 +56,8 @@ def part2_game(player1_cards, player2_cards, game_number):
             else:
                 round_winning_player = 2
         else:
-            round_winning_player = part2_game(player1_cards[:player1_top_card], player2_cards[:player2_top_card], game_number + 1)
+            round_winning_player = part2_game(player1_cards[:player1_top_card], player2_cards[:player2_top_card],
+                                              game_number + 1)
 
         if round_winning_player == 1:
             player1_cards.append(player1_top_card)
@@ -80,7 +81,10 @@ def part2_game(player1_cards, player2_cards, game_number):
             if len(player2_cards) == 0:
                 winning_player = 1
         round_number += 1
+        print("--------------------")
 
+    print("WINNER: " + str(winning_player))
+    print("===================")
     return winning_player
 
 
