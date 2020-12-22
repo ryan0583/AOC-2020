@@ -31,7 +31,7 @@ def part1():
 
     result = 0
     winning_hand = (player1_cards if len(player1_cards) > 0 else player2_cards)[::-1]
-    print(winning_hand)
+    # print(winning_hand)
 
     for index, card in enumerate(winning_hand):
         result += (index + 1) * card
@@ -41,7 +41,7 @@ def part1():
 
 def part2_game(player1_cards, player2_cards, game_number):
     def play_round():
-        this_round_cards = (tuple(player1_cards), tuple(player2_cards))
+        this_round_cards = tuple([frozenset(player1_cards), frozenset(player2_cards)])
         if this_round_cards in previous_rounds_cards:
             return 1
         else:
@@ -68,12 +68,12 @@ def part2_game(player1_cards, player2_cards, game_number):
 
         return 0
 
-    print('GAME: ' + str(game_number))
+    # print('GAME: ' + str(game_number))
     winning_player = 0
     previous_rounds_cards = set()
     round_number = 1
     while winning_player == 0:
-        print('ROUND: ' + str(round_number))
+        # print('ROUND: ' + str(round_number))
         winning_player = play_round()
         if winning_player == 0:
             if len(player1_cards) == 0:
@@ -81,10 +81,10 @@ def part2_game(player1_cards, player2_cards, game_number):
             if len(player2_cards) == 0:
                 winning_player = 1
         round_number += 1
-        print("--------------------")
+        # print("--------------------")
 
-    print("WINNER: " + str(winning_player))
-    print("===================")
+    # print("WINNER: " + str(winning_player))
+    # print("===================")
     return winning_player
 
 
@@ -95,7 +95,7 @@ def part2():
 
     result = 0
     winning_hand = (player1_cards if winning_player == 1 else player2_cards)[::-1]
-    print(winning_hand)
+    # print(winning_hand)
 
     for index, card in enumerate(winning_hand):
         result += (index + 1) * card
@@ -103,5 +103,5 @@ def part2():
     print(result)
 
 
-# part1()
+part1()
 part2()
