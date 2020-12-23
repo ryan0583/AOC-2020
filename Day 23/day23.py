@@ -1,57 +1,120 @@
 from Utils.file_reader import read_lines
 
 
+class Entry:
+    def __init__(self, value):
+        self.value = value
+        self.next_cup = None
+
+    def set_next_cup(self, next_cup):
+        self.next_cup = next_cup
+
+    def get_value(self):
+        return self.value
+
+
+def move(current_cup, max_cup_value, cup_map, cup_one):
+    # print('CURRENT CUP: ' + str(current_cup.value))
+    # print(current_cup.next_cup.value)
+    # print(current_cup.next_cup.next_cup.value)
+    # print(current_cup.next_cup.next_cup.next_cup.value)
+
+    pickup_cups = [current_cup.next_cup.value, current_cup.next_cup.next_cup.value, current_cup.next_cup.next_cup.next_cup.value]
+
+    dest_cup_value = current_cup.value - 1
+    while dest_cup_value in pickup_cups or dest_cup_value <= 0:
+        dest_cup_value -= 1
+        if dest_cup_value < 1:
+            dest_cup_value = max_cup_value
+
+    dest_cup = cup_map[dest_cup_value]
+
+    # print(dest_cup.value)
+
+    removed_cup = current_cup.next_cup
+
+    current_cup.set_next_cup(
+        current_cup.next_cup.next_cup.next_cup.next_cup)
+
+    removed_cup.next_cup.next_cup.set_next_cup(dest_cup.next_cup)
+    dest_cup.set_next_cup(removed_cup)
+
+    # next_cup = cup_one.next_cup
+    # result = ''
+    # while next_cup.value != 1:
+    #     result += str(next_cup.value)
+    #     next_cup = next_cup.next_cup
+    #
+    # print(result)
+    # print('===================')
+
+    return current_cup.next_cup
+
+
 def part1():
-    def move(current_line):
-        print(current_line)
-        print(current_cup)
+    line = [Entry(int(c)) for c in read_lines('Input.txt')[0]]
 
-        new_line = current_line
+    for index, entry in enumerate(line):
+        entry.set_next_cup(line[(index + 1) % len(line)])
 
-        current_index = line.index(current_cup)
-        removed_cups = ''
-
-        for times in range(0, 3):
-            next_index = (current_index + 1) % len(new_line)
-
-            num = new_line[next_index]
-            new_line = new_line[:next_index] + new_line[next_index + 1:]
-            print(new_line)
-
-            removed_cups += num
-
-            current_index = new_line.index(current_cup)
-
-        print(removed_cups)
-
-        dest_cup = int(current_cup) - 1
-        min_cup = min([int(c) for c in current_line])
-        max_cup = max([int(c) for c in current_line])
-        while str(dest_cup) not in new_line:
-            dest_cup -= 1
-            if dest_cup < min_cup:
-                dest_cup = max_cup
-
-        print(dest_cup)
-        dest_index = new_line.index(str(dest_cup))
-        new_line = new_line[:dest_index + 1] + removed_cups + new_line[dest_index + 1:]
-
-        print(new_line)
-        print('================')
-
-        return new_line
-
-    line = read_lines('Input.txt')[0]
-
+    cup_one = [cup for cup in line if cup.value == 1][0]
     current_cup = line[0]
+    max_cup_value = max([e.value for e in line])
+    cup_map = {e.value: e for e in line}
+
+    # print(line[0].value)
+    # print(line[0].next_cup.value)
+
+    next_cup = cup_one.next_cup
+    result = ''
+    while next_cup.value != 1:
+        result += str(next_cup.value)
+        next_cup = next_cup.next_cup
+
+    print(result)
 
     for i in range(0, 100):
         print('MOVE: ' + str(i + 1))
-        line = move(line)
-        next_cup_index = (line.index(str(current_cup)) + 1) % len(line)
-        current_cup = line[next_cup_index]
+        current_cup = move(current_cup, max_cup_value, cup_map, cup_one)
 
-    print(line)
+    next_cup = cup_one.next_cup
+    result = ''
+    while next_cup.value != 1:
+        result += str(next_cup.value)
+        next_cup = next_cup.next_cup
+
+    print(result)
 
 
-part1()
+def part2():
+    line = [Entry(int(c)) for c in read_lines('Input.txt')[0]]
+
+    max_num = max([int(e.value) for e in line])
+
+    for i in range(max_num + 1, 1000001):
+        line.append(Entry(i))
+
+    for index, entry in enumerate(line):
+        entry.set_next_cup(line[(index + 1) % len(line)])
+
+    cup_one = [cup for cup in line if cup.value == 1][0]
+    current_cup = line[0]
+
+    max_cup_value = max([e.value for e in line])
+    cup_map = {e.value: e for e in line}
+
+    # print(line[0].value)
+    # print(line[0].next_cup.value)
+
+    for i in range(0, 10000000):
+        print('MOVE: ' + str(i + 1))
+        current_cup = move(current_cup, max_cup_value, cup_map, cup_one)
+
+    result = cup_one.next_cup.value * cup_one.next_cup.next_cup.value
+    print(cup_one.next_cup.value)
+    print(cup_one.next_cup.next_cup.value)
+    print(result)
+
+
+# part1()
+part2()
