@@ -61,20 +61,23 @@ def get_neighbour_tiles(tile):
 def perform_day_flip(black_tiles):
     new_black_tiles = []
 
-    min_x = min([point.x for point in black_tiles]) - 1
-    max_x = max([point.x for point in black_tiles]) + 1
-    min_y = min([point.y for point in black_tiles]) - 1
-    max_y = max([point.y for point in black_tiles]) + 1
+    min_x = min([point.x for point in black_tiles]) - 2
+    max_x = max([point.x for point in black_tiles]) + 2
+    min_y = min([point.y for point in black_tiles]) - 2
+    max_y = max([point.y for point in black_tiles]) + 2
 
-    for x in range(min_x, max_x + 1):
-        for y in range(min_y, max_y + 1):
-            point_to_check = Point(x, y)
-            neighbours = get_neighbour_tiles(point_to_check)
-            black_neighbours = black_tiles.intersection(neighbours)
-            if len(black_neighbours) == 2:
-                new_black_tiles.append(point_to_check)
-            elif point_to_check in black_tiles and len(black_neighbours) == 1:
-                new_black_tiles.append(point_to_check)
+    points = [Point(x, y)
+              for x in range(min_x, max_x + 1)
+              for y in range(min_y, max_y + 1)
+              if (abs(x) + abs(y)) % 2 == 0]
+
+    for point_to_check in points:
+        neighbours = get_neighbour_tiles(point_to_check)
+        black_neighbours = black_tiles.intersection(neighbours)
+        if len(black_neighbours) == 2:
+            new_black_tiles.append(point_to_check)
+        elif point_to_check in black_tiles and len(black_neighbours) == 1:
+            new_black_tiles.append(point_to_check)
 
     return set(new_black_tiles)
 
@@ -85,6 +88,7 @@ def part2():
     for i in range(0, 100):
         print('DAY: ' + str(i + 1))
         black_tiles = perform_day_flip(black_tiles)
+        print(len(black_tiles))
 
     print(len(black_tiles))
 
